@@ -2,24 +2,30 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>ПЕРВЫЙ ЭКРАН — сплит 50/50</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artition — дизайн, монтаж, миры</title>
+<meta name="description" content="Artition: рисую и монтирую для Minecraft — контент, обложки, айдентика серверов. Канал M_0_O_n и последние видео.">
+<meta property="og:title" content="Artition — дизайн, монтаж, миры">
+<meta property="og:description" content="Пишу и рисую для Minecraft: контент, обложки, айдентика серверов. Веду канал и снимаю то, что сам хотел бы смотреть.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/flame.svg" type="image/svg+xml">
 <style>
   @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
   @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
   @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
   :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A;--night:#0C0718}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{width:1440px;background:var(--paper);color:var(--ink);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
+  body{width:100%;max-width:1600px;margin:0 auto;background:var(--paper);color:var(--ink);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
 
   .screen{position:relative;display:grid;grid-template-columns:1fr 1fr;height:1000px;overflow:hidden}
 
   /* ── фоновые панели: под кубом ── */
-  .paperPanel{position:absolute;left:0;top:0;width:744px;height:1000px;overflow:hidden;z-index:0}
+  .paperPanel{position:absolute;left:0;top:0;width:calc(50% + 24px);height:1000px;overflow:hidden;z-index:0}
   .paperPanel .paperbg{position:absolute;inset:0;background-image:url("assets/paper.png");
     background-size:135% 135%;background-position:center;opacity:.22;mix-blend-mode:multiply}
   .paperPanel .halftone{position:absolute;inset:0;opacity:.2;
     background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
-  .bgPanel{position:absolute;left:720px;top:0;width:720px;height:1000px;background:var(--night);overflow:hidden;z-index:0}
+  .bgPanel{position:absolute;left:50%;top:0;width:50%;height:1000px;background:var(--night);overflow:hidden;z-index:0}
   .bgPanel #bg{position:absolute;inset:0;width:100%;height:100%}
   .bgPanel .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,5,32,.32) 0%,rgba(10,5,32,.66) 55%,rgba(10,5,32,.92) 100%)}
 
@@ -100,27 +106,70 @@
   .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:#120B24}
   .shot canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
   .shot .dur{position:absolute;right:7px;bottom:6px;font-family:"Chaos16";font-size:14px;color:var(--paper)}
-  .vcard h3{font-size:14.5px;line-height:1.3;font-weight:400;margin-top:10px;max-width:94%}
+  .vcard h3{font-size:14.5px;line-height:1.3;font-weight:400;margin-top:10px;max-width:94%;min-height:2.6em}
   .vmeta{display:flex;justify-content:space-between;align-items:baseline;margin-top:7px;
     font-family:"Chaos16";font-size:15px;color:var(--orange)}
   .vmeta span{font-family:"Montserrat";font-size:11px;letter-spacing:.1em;color:rgba(239,233,220,.45)}
 
   /* ── подвал ── */
-  .foot{position:relative;background:var(--night);color:#EFE9DC;padding:89px 60px 34px;overflow:hidden}
+  .foot{position:relative;display:grid;grid-template-columns:1fr auto;column-gap:89px;align-items:end;
+    background:var(--night);color:#EFE9DC;padding:89px 60px 34px;overflow:hidden}
   .foot>.grain{position:absolute;inset:0;opacity:.5;pointer-events:none;
     background:radial-gradient(120% 90% at 78% -10%, rgba(108,59,255,.55) 0%, rgba(12,7,24,0) 62%)}
   .foot>*{position:relative}
-  .foot .fh{font-family:"Chaos16";font-size:21px;color:rgba(239,233,220,.6)}
-  .mail{display:inline-block;margin:13px 0 55px;font-family:"UnboundedX";font-weight:900;font-size:89px;
+  .foot .fh{grid-column:1;font-family:"Chaos16";font-size:21px;color:rgba(239,233,220,.6)}
+  .mail{grid-column:1;display:inline-block;margin:13px 0 0;font-family:"UnboundedX";font-weight:900;font-size:89px;
     letter-spacing:-.035em;color:#EFE9DC;text-decoration:none;transition:color .2s}
   .mail em{font-style:normal;color:var(--orange)}
   .mail:hover{color:var(--purple)}
   .mail:hover em{color:#EFE9DC}
-  .fl{display:flex;gap:34px;font-family:"Chaos16";font-size:17px;margin-bottom:89px}
+  .fl{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;gap:13px;align-items:flex-start;
+    font-family:"Chaos16";font-size:17px;padding-bottom:9px}
   .fl a{color:rgba(239,233,220,.72);text-decoration:none;transition:color .2s}
   .fl a:hover{color:var(--orange)}
-  .print{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-    color:rgba(239,233,220,.42);border-top:1px solid rgba(239,233,220,.16);padding-top:21px}
+  .print{grid-column:1 / -1;display:flex;justify-content:space-between;margin-top:89px;font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:rgba(239,233,220,.42);
+    border-top:1px solid rgba(239,233,220,.16);padding-top:21px}
+
+  :focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+  .foot :focus-visible{outline-color:var(--orange)}
+
+  @media (max-width:900px){    body{width:100%;overflow-x:hidden}
+    .screen{display:block;height:1120px}
+    .paperPanel{width:100%;height:620px}
+    .bgPanel{left:0;top:620px;width:100%;height:500px}
+    .left{position:absolute;left:0;top:0;width:100%;height:620px;padding:28px 22px 24px}
+    .right{position:absolute;left:0;top:620px;width:100%;height:500px;padding:34px 22px 28px}
+    .mark svg{width:22px;height:44px}
+    .mark{gap:9px}
+    .mark .wm{font-size:10px}
+    .plate{width:100%;height:auto}
+    #flame{left:-120px;top:-40px;width:240px;height:400px}
+    .cubeWrap{display:none}
+    .soc-bar{gap:7px;margin-top:16px}
+    .soc{width:30px;height:30px}
+    .about{margin-top:0}
+    .about .lead{font-size:24px;margin-bottom:13px}
+    .about p{font-size:13px;line-height:1.55;margin-bottom:9px}
+    .tracks{margin-top:21px}
+    .tlabel{font-size:15px;margin-bottom:13px}
+    .trow{gap:8px}
+    .track{padding:6px 6px 9px}
+    .track b{font-size:10px;margin-top:6px;line-height:1.2}
+    .track i{font-size:11px;margin-top:2px}
+    .cov .no{font-size:13px;left:4px;top:2px}
+    .paperSec{padding:55px 22px}
+    .vhead{flex-direction:column;align-items:flex-start;gap:21px;margin-bottom:34px}
+    .vhead h2{font-size:55px}
+    .vnote{text-align:left;font-size:15px}
+    .vgrid{grid-template-columns:1fr;gap:21px}
+    .vcard h3{font-size:13.5px;min-height:0}
+    .foot{grid-template-columns:1fr;column-gap:0;padding:55px 22px 28px}
+    .foot .fh{font-size:15px}
+    .mail{font-size:34px;letter-spacing:-.03em;margin-top:9px}
+    .fl{grid-column:1;grid-row:auto;flex-direction:row;flex-wrap:wrap;gap:16px;margin-top:34px;font-size:14px;padding-bottom:0}
+    .print{flex-direction:column;gap:9px;margin-top:55px;font-size:10px}
+  }
 </style>
 </head>
 <body>
@@ -334,13 +383,31 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
 /* ── рваная кромка стыка: одинаковый профиль на обеих половинах ── */
 (function(){
   const L=document.querySelector('.paperPanel'), R=document.querySelector('.bgPanel');
-  const W=720,H=1000,step=9,amp=13;
   const h=i=>{ let n=i*374761393+668265263; n=(n^(n>>13))*1274126177; return ((n^(n>>16))>>>0)/4294967295; };
   const vn=i=>{ const a=h(Math.floor(i)),b=h(Math.floor(i)+1),f=i-Math.floor(i),u=f*f*(3-2*f); return a*(1-u)+b*u; };
-  const pts=[];
-  for(let y=0;y<=H;y+=step){ const t=y/step; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
-  R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),`${W}px 100%`,`${W}px 0`].join(',')})`;
-  L.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${(W+x).toFixed(1)}px ${y}px`),'0 100%'].join(',')})`;
+  function draw(){
+    if(matchMedia('(max-width:900px)').matches){
+      const W=R.offsetWidth||innerWidth, H=R.offsetHeight||500, step=9, amp=11;
+      const top=[],bot=[];
+      for(let x=0;x<=W;x+=step){
+        const t=x/step;
+        const n1=vn(t)*.65+vn(t*3.7+9)*.35;
+        const n2=vn(t+61)*.65+vn(t*3.1+17)*.35;
+        top.push([x,n1*amp]); bot.push([x,H-n2*amp]);
+      }
+      const poly=[...top.map(([x,y])=>`${x}px ${y.toFixed(1)}px`),
+                  ...bot.reverse().map(([x,y])=>`${x}px ${y.toFixed(1)}px`)];
+      R.style.clipPath=`polygon(${poly.join(',')})`;
+      L.style.clipPath='none';
+    }else{
+      const W=R.offsetWidth||720,H=R.offsetHeight||1000,step=9,amp=13,pts=[];
+      for(let y=0;y<=H;y+=step){ const t=y/step; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
+      R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),`${W}px 100%`,`${W}px 0`].join(',')})`;
+      L.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${(W+x).toFixed(1)}px ${y}px`),'0 100%'].join(',')})`;
+    }
+  }
+  draw();
+  addEventListener('resize',()=>{ clearTimeout(window.__rs); window.__rs=setTimeout(draw,120); });
 })();
 
 /* ── фон правой половины: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
@@ -555,7 +622,7 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
   let mx=window.innerWidth*0.06, my=window.innerHeight*0.92, hasPointer=false;
   window.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; hasPointer=true; },{passive:true});
 
-  let spread=1, tiltX=0, tiltY=0;
+  let spread=0, tiltX=0, tiltY=0;
   const t0=performance.now();
 
   function frame(now){
@@ -563,7 +630,7 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
     const cxp=r.left+r.width/2, cyp=r.top+r.height/2;
     const dx=mx-cxp, dy=my-cyp, dist=Math.hypot(dx,dy);
     const t=Math.min(1,Math.max(0,(dist-150)/430));
-    spread += ((hasPointer?t:1)-spread)*0.09;
+    spread += ((hasPointer?t:0)-spread)*0.09;
     tiltY += ((dx/560)-tiltY)*0.08;
     tiltX += ((dy/700)-tiltX)*0.08;
 
@@ -723,7 +790,7 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
     ['v3',stopsC,(u,v)=>Math.min(1,Math.max(0,.15+.85*(u*.62+v*.38)))],
     ['v4',stopsA,(u,v)=>Math.min(1,Math.max(0,.55+.55*Math.sin(Math.hypot(u-.5,v-.5)*23-.8)))],
     ['v5',stopsC,(u,v)=>Math.min(1,Math.max(0,.9-.9*Math.abs(v-.42)*1.9+.18*Math.sin(u*9+1)))],
-    ['v6',stopsB,(u,v)=>Math.min(1,Math.max(0,.85-.85*Math.hypot(u-.62,v-.62)*1.5))]
+    ['v6',stopsA,(u,v)=>Math.min(1,Math.max(0,.92-.92*Math.hypot(u-.62,v-.58)*1.35))]
   ];
   specs.forEach(([id,stops,field])=>{
     const c=document.getElementById(id);
@@ -757,12 +824,16 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
 /* ── рваная верхняя кромка подвала ── */
 (function(){
   const f=document.querySelector('.foot'); if(!f) return;
-  const W=1440, H=f.offsetHeight+40, step=9, amp=11, pts=[];
-  for(let x=0;x<=W;x+=step){
-    const n=vnoise(x*0.045,7.3,91)*2-1;
-    pts.push(x+'px '+Math.round(9+n*amp)+'px');
+  function draw(){
+    const W=f.offsetWidth, H=f.offsetHeight+40, step=9, amp=11, pts=[];
+    for(let x=0;x<=W;x+=step){
+      const n=vnoise(x*0.045,7.3,91)*2-1;
+      pts.push(x+'px '+Math.round(9+n*amp)+'px');
+    }
+    f.style.clipPath='polygon('+pts.join(',')+', '+W+'px '+H+'px, 0px '+H+'px)';
   }
-  f.style.clipPath='polygon('+pts.join(',')+', '+W+'px '+H+'px, 0px '+H+'px)';
+  draw();
+  addEventListener('resize',()=>{ clearTimeout(window.__fs); window.__fs=setTimeout(draw,150); });
 })();
 </script>
 </body>
