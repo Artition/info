@@ -85,8 +85,8 @@
   .track:nth-child(2){--rot:1.2deg}
   .track:nth-child(3){--rot:-.8deg}
   .track .foil,.vcard .foil{position:absolute;inset:0;z-index:3;opacity:0;transition:opacity .25s;pointer-events:none;
-    background:linear-gradient(115deg,transparent 12%,rgba(0,255,170,.55) 27%,rgba(255,0,190,.55) 41%,rgba(120,80,255,.55) 55%,rgba(255,180,0,.5) 69%,transparent 85%);
-    background-size:240% 240%;background-position:var(--fx,50%) var(--fy,50%);mix-blend-mode:overlay}
+    background:linear-gradient(115deg,transparent 26%,rgba(0,255,170,.42) 36%,rgba(255,0,190,.46) 44%,rgba(120,80,255,.42) 52%,rgba(255,180,0,.38) 60%,transparent 70%);
+    background-size:200% 200%;background-position:var(--fx,50%) var(--fy,50%);mix-blend-mode:overlay}
   .track:hover .foil,.vcard:hover .foil{opacity:1}
 
   /* ── секция «видео» на бумаге ── */
@@ -102,6 +102,9 @@
     color:rgba(23,18,16,.5);margin-top:7px}
   .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
   .vcard{position:relative;isolation:isolate;display:block;padding:9px 9px 13px;color:#EFE9DC;text-decoration:none}
+  .vcard:nth-child(3n+1){--rot:-.45deg}
+  .vcard:nth-child(3n+2){--rot:.35deg}
+  .vcard:nth-child(3n){--rot:-.2deg}
   .vcard::before{content:"";position:absolute;inset:0;background:var(--night);filter:url(#torn);z-index:-1}
   .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:#120B24}
   .shot canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
