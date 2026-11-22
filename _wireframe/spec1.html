@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>СИСТЕМА v1 — палитра и шрифты</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Golos+Text:wght@400;500;700&family=Handjet:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E9E3D5;
+    --paper-2:#DCD4C2;
+    --ink:#171210;
+    --purple:#6C3BFF;
+    --purple-deep:#2A1258;
+    --orange:#FF6A1A;
+    --lime:#C6FF3D;
+    --magenta:#FF2E93;
+    --cyan:#3ADFFF;
+    --dark:#140E24;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    width:1440px;min-height:1180px;background:var(--paper);color:var(--ink);
+    font-family:"Golos Text",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    position:relative;overflow:hidden;
+  }
+  /* материал: зерно бумаги + полутон */
+  .grain{
+    position:absolute;inset:0;pointer-events:none;z-index:9;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.42'/></svg>");
+  }
+  .halftone{
+    position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.5;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1.1px, transparent 1.2px);
+    background-size:6px 6px;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 28%,#000 62%,transparent 96%);
+  }
+  .wrap{position:relative;z-index:2;padding:55px 60px}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;
+    font-family:"Handjet",sans-serif;font-weight:700;font-size:21px;letter-spacing:.06em;text-transform:uppercase}
+  header .r{text-align:right;line-height:1.35;opacity:.75;text-transform:none;letter-spacing:.02em;font-family:"Golos Text";font-size:13px}
+
+  h2.sec{font-family:"Handjet";font-weight:700;font-size:21px;letter-spacing:.1em;text-transform:uppercase;
+    margin:55px 0 21px;display:flex;gap:13px;align-items:center;opacity:.6}
+  h2.sec::after{content:"";flex:1;height:1px;background:currentColor;opacity:.35}
+
+  /* ── ПАЛИТРА ── */
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:21px}
+  .sw{height:200px;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:13px;
+    border:2px solid var(--ink)}
+  .sw b{font-family:"Unbounded";font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;display:block}
+  .sw i{display:block;font-style:normal;font-family:"Handjet";font-weight:400;font-size:20px;line-height:1;letter-spacing:.05em;opacity:.85;margin-top:13px}
+  .sw.chip .role,.sw.chip .role,.sw.chip b,.sw.chip i{position:relative;z-index:2;color:var(--ink);background:var(--paper)}
+  .sw.chip b,.sw.chip i{display:block;width:max-content;max-width:100%;font-size:11px;padding:2px 4px}
+  .sw .role{position:absolute;top:13px;left:13px;font-family:"Golos Text";font-size:11px;letter-spacing:.13em;text-transform:uppercase;opacity:.65}
+  .sw.light{color:var(--ink)}
+  .sw.dark{color:#F2EDE3}
+  .sw.dark .role{opacity:.7}
+
+  /* ── ТИПОГРАФИКА ── */
+  .typerow{display:grid;grid-template-columns:380px 1fr;gap:55px;border-top:1px solid rgba(23,18,16,.18);padding:21px 0}
+  .typerow .who{font-family:"Handjet";font-weight:700;font-size:19px;letter-spacing:.07em;text-transform:uppercase;line-height:1.45}
+  .typerow .who small{display:block;font-family:"Golos Text";font-size:13px;letter-spacing:0;text-transform:none;opacity:.6;font-weight:400;margin-top:5px}
+  .display{font-family:"Unbounded";font-weight:900;font-size:89px;line-height:.92;letter-spacing:-.03em;text-transform:uppercase}
+  .display em{font-style:normal;color:var(--purple)}
+  .h2samp{font-family:"Unbounded";font-weight:700;font-size:34px;line-height:1.1;letter-spacing:-.01em;text-transform:uppercase}
+  .body-samp{font-size:21px;line-height:1.55;max-width:640px}
+  .body-samp b{font-weight:700}
+  .meta-samp{font-family:"Handjet";font-weight:700;font-size:34px;letter-spacing:.06em;text-transform:uppercase;color:var(--purple-deep)}
+  .meta-samp s{text-decoration:none;color:var(--orange)}
+
+  /* ── ТЁМНАЯ ПЛАШКА ── */
+  .band{margin-top:55px;height:340px;position:relative;background:var(--dark);border:2px solid var(--ink);
+    overflow:hidden;display:flex;align-items:flex-end;padding:34px;gap:34px;z-index:2}
+  .band::before{content:"";position:absolute;inset:-30%;
+    background:
+      radial-gradient(ellipse 46% 40% at 28% 34%, #6C3BFF 0%, rgba(108,59,255,0) 65%),
+      radial-gradient(ellipse 40% 46% at 76% 72%, #FF6A1A 0%, rgba(255,106,26,0) 62%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, #2A1258 0%, #140E24 72%);
+    filter:blur(6px);animation:drift 34s ease-in-out infinite alternate}
+  @keyframes drift{0%{transform:translate3d(-3%,-2%,0) scale(1.06) rotate(-2deg)}
+    100%{transform:translate3d(3%,3%,0) scale(1.12) rotate(2deg)}}
+  .band::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+    background-image:radial-gradient(circle at center, rgba(255,255,255,.5) 1px, transparent 1.1px);
+    background-size:5px 5px;mix-blend-mode:overlay}
+  .card{position:relative;z-index:3;width:220px;height:308px;border:2px solid #0B0714;transform-style:preserve-3d;
+    transform:perspective(900px) rotateX(10deg) rotateY(-14deg);
+    background:
+      linear-gradient(112deg,rgba(255,255,255,.72) 0%,rgba(255,255,255,0) 20%,rgba(255,255,255,.28) 34%,rgba(255,255,255,0) 48%,rgba(255,255,255,.5) 62%,rgba(255,255,255,0) 74%),
+      linear-gradient(158deg,#2A1258 0%,#6C3BFF 18%,#3ADFFF 33%,#C6FF3D 47%,#FF6A1A 63%,#FF2E93 78%,#2A1258 100%);
+    box-shadow:0 18px 40px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.35)}
+  .card span{position:absolute;left:0;right:0;bottom:0;padding:13px;font-family:"Handjet";font-weight:700;
+    font-size:19px;letter-spacing:.06em;color:#0B0714;background:rgba(233,227,213,.82);text-transform:uppercase}
+  .bandtext{position:relative;z-index:3;color:#F2EDE3;max-width:560px}
+  .bandtext h3{font-family:"Unbounded";font-weight:900;font-size:55px;line-height:.95;text-transform:uppercase;letter-spacing:-.02em}
+  .bandtext h3 em{font-style:normal;color:var(--orange)}
+  .bandtext p{margin-top:13px;font-size:15px;line-height:1.5;opacity:.72;max-width:420px}
+</style>
+</head>
+<body>
+<div class="halftone"></div>
+<div class="grain"></div>
+
+<div class="wrap">
+  <header>
+    <div>Система · лист 1 <span style="color:#6C3BFF">/</span> палитра и шрифты</div>
+    <div class="r">личный лендинг · бумага → экран<br>φ 1.618</div>
+  </header>
+
+  <h2 class="sec">01 · палитра</h2>
+  <div class="swatches">
+    <div class="sw light" style="background:var(--paper)">
+      <div class="role">основа</div><b>Paper</b><i>#E9E3D5</i>
+    </div>
+    <div class="sw dark" style="background:var(--ink)">
+      <div class="role">текст / контур</div><b>Ink</b><i>#171210</i>
+    </div>
+    <div class="sw dark" style="background:var(--purple)">
+      <div class="role">первый акцент</div><b>Flame</b><i>#6C3BFF</i>
+    </div>
+    <div class="sw dark" style="background:var(--orange)">
+      <div class="role">второй акцент</div><b>Spark</b><i>#FF6A1A</i>
+    </div>
+    <div class="sw dark" style="background:var(--purple-deep)">
+      <div class="role">экран / глубина</div><b>Night</b><i>#2A1258</i>
+    </div>
+    <div class="sw chip" style="background:linear-gradient(160deg,#2A1258 0%,#6C3BFF 20%,#3ADFFF 36%,#C6FF3D 50%,#FF6A1A 66%,#FF2E93 80%,#2A1258 100%)">
+      <div class="role">фольга / край</div><b>CMYK-сдвиг · 4 краски</b><i></i>
+    </div>
+  </div>
+
+  <h2 class="sec">02 · шрифты</h2>
+
+  <div class="typerow">
+    <div class="who">Unbounded 900<small>заголовки, имя, цифры блоков</small></div>
+    <div class="display">Имя<br><em>Фамилия</em></div>
+  </div>
+
+  <div class="typerow">
+    <div class="who">Unbounded 700<small>подзаголовки, кнопки, подписи</small></div>
+    <div class="h2samp">О себе · Видео · Связаться</div>
+  </div>
+
+  <div class="typerow">
+    <div class="who">Golos Text 400/700<small>основной текст, 21 px, интерлиньяж 1.55</small></div>
+    <div class="body-samp">Рисую, монтирую и делаю миры, в которые хочется зайти. <b>Полутон, фольга, пиксель</b> — не украшение, а способ держать внимание.</div>
+  </div>
+
+  <div class="typerow" style="border-bottom:1px solid rgba(23,18,16,.18)">
+    <div class="who">Handjet 700<small>метки, номера, пиксельные подписи</small></div>
+    <div class="meta-samp">01 — герой <s>/</s> 13.7K <s>/</s> M_0O_n</div>
+  </div>
+
+  <div class="band">
+    <div class="card"><span>фольга · наклон 3D</span></div>
+    <div class="bandtext">
+      <h3>Тёмный<br><em>экран</em></h3>
+      <p>Мрамор на фиолетово-оранжевом, пиксельная рамка, полутон поверх света. Медленный дрейф 34 с.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

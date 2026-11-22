@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ГЕРОЙ — в цвете</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Bold.otf");font-weight:700}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
+
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;height:1000px;background:var(--paper);color:var(--ink);position:relative;overflow:hidden;
+    font-family:"Montserrat",sans-serif;-webkit-font-smoothing:antialiased}
+
+  .paperbg{position:absolute;inset:0;z-index:0;background-image:url("assets/paper.png");
+    background-size:cover;background-position:center;opacity:.22;mix-blend-mode:multiply}
+  .halftone{position:absolute;inset:0;z-index:1;opacity:.22;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);
+    background-size:6px 6px}
+  .colornoise{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:.32;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='300' height='300' filter='url(%23c)'/></svg>");
+    background-size:300px}
+
+  .stage{position:absolute;inset:0;z-index:2;padding:55px 60px}
+
+  /* верхние углы */
+  .top{display:flex;justify-content:space-between;align-items:flex-start}
+  .mark{display:flex;align-items:center;gap:13px}
+  .mark .fl{width:34px;height:68px;background:var(--ink);
+    -webkit-mask:url("assets/flame.svg") center/contain no-repeat;mask:url("assets/flame.svg") center/contain no-repeat}
+  .mark .wm{font-family:"UnboundedX";font-weight:900;font-size:13px;letter-spacing:.28em;text-transform:uppercase}
+  .meta{font-family:"Chaos16";font-size:17px;line-height:1.65;text-align:right;letter-spacing:.04em}
+  .meta span{display:block}
+  .meta em{font-style:normal;color:var(--purple)}
+
+  /* имя */
+  .name{position:absolute;left:55px;right:55px;top:250px;
+    font-family:"UnboundedX";font-weight:900;font-size:212px;line-height:.8;letter-spacing:-.035em;
+    text-transform:uppercase;white-space:nowrap}
+  .name b{color:var(--purple);font-weight:900}
+
+  /* рукописная строка */
+  .script{position:absolute;left:62px;top:452px;font-family:"Marck Script";font-size:64px;
+    color:var(--orange);transform:rotate(-2.2deg);transform-origin:left center;white-space:nowrap}
+
+  /* низ */
+  .bottom{position:absolute;left:60px;right:60px;bottom:55px;display:flex;justify-content:space-between;align-items:flex-end}
+  .role{font-size:13px;letter-spacing:.2em;text-transform:uppercase;line-height:2}
+  .role i{font-style:normal;color:var(--purple)}
+  .scroll{display:flex;align-items:center;gap:13px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.7}
+  .scroll .arw{width:34px;height:34px;border:2px solid var(--ink);border-radius:50%;position:relative}
+  .scroll .arw::after{content:"";position:absolute;left:50%;top:9px;width:2px;height:14px;background:var(--ink);transform:translateX(-50%)}
+  .scroll .arw::before{content:"";position:absolute;left:50%;top:16px;width:7px;height:7px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:translateX(-50%) rotate(45deg)}
+</style>
+</head>
+<body>
+<div class="paperbg"></div><div class="halftone"></div>
+<div class="stage">
+  <div class="top">
+    <div class="mark"><div class="fl"></div><div class="wm">Artition</div></div>
+    <div class="meta">
+      <span>01 <em>/</em> герой</span>
+      <span>M_0O_n <em>·</em> youtube</span>
+    </div>
+  </div>
+</div>
+
+<div class="name">Artition</div>
+<div class="script">дизайн, монтаж, миры</div>
+
+<div class="bottom">
+  <div class="role">дизайнер <i>·</i> ютубер <i>·</i> художник</div>
+  <div class="scroll"><div class="arw"></div>листай</div>
+</div>
+<div class="colornoise"></div>
+</body>
+</html>

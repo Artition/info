@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>СИСТЕМА v3 — рукописный</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Neucha&family=Caveat:wght@700&family=Marck+Script&family=Rubik+Wet+Paint&family=Rubik+Spray+Paint&family=Rubik+Marker+Hatch&family=Rubik+Dirt&family=Rubik+Beastly&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Kosolapa";src:url("fonts/KosolapaScript-Regular.ttf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Bold.otf");font-weight:700}
+
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;background:var(--paper);color:var(--ink);position:relative;
+    font-family:"Montserrat",sans-serif;-webkit-font-smoothing:antialiased}
+
+  .paperbg{position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:url("assets/paper.png");background-size:cover;background-position:center;
+    opacity:.22;mix-blend-mode:multiply}
+  .colornoise{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:.32;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='300' height='300' filter='url(%23c)'/></svg>");
+    background-size:300px}
+  .halftone{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.22;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);
+    background-size:6px 6px}
+  .wrap{position:relative;z-index:2}
+
+  .head{display:flex;justify-content:space-between;padding:34px 60px 0;font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+  .head .r{text-align:right;letter-spacing:.06em;text-transform:none;opacity:.6;font-size:12px}
+
+  .hero{padding:55px 60px 34px}
+  .name{font-family:"UnboundedX";font-weight:900;font-size:144px;line-height:.86;letter-spacing:-.02em;text-transform:uppercase;white-space:nowrap}
+  .sub{margin-top:14px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+
+  .list{border-top:1px solid rgba(23,18,16,.22);margin:0 60px}
+  .item{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:baseline;
+    padding:21px 0;border-bottom:1px solid rgba(23,18,16,.14)}
+  .item .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;line-height:1.9}
+  .item .lbl b{display:block;color:var(--purple);font-size:12px;letter-spacing:.1em;margin-bottom:5px}
+  .phrase{font-size:72px;line-height:1.15;white-space:nowrap}
+
+  .f1{font-family:"Neucha"}
+  .f2{font-family:"Caveat";font-weight:700}
+  .f3{font-family:"Marck Script"}
+  .f4{font-family:"Rubik Wet Paint"}
+  .f5{font-family:"Rubik Spray Paint"}
+  .f6{font-family:"Rubik Marker Hatch"}
+  .f7{font-family:"Rubik Dirt"}
+  .f8{font-family:"Rubik Beastly"}
+  .f9{font-family:"Kosolapa";color:var(--orange)}
+
+  .foot{padding:34px 60px 55px;font-size:13px;line-height:1.6;max-width:640px;opacity:.7}
+</style>
+</head>
+<body>
+<div class="paperbg"></div><div class="halftone"></div><div class="colornoise"></div>
+<div class="wrap">
+
+  <div class="head">
+    <div>Система v3 · рукописный</div>
+    <div class="r">бумага 22% · цветной шум 32% overlay<br>ник ARTITION</div>
+  </div>
+
+  <div class="hero">
+    <div class="name">Artition</div>
+    <div class="sub">дизайнер · ютубер · художник</div>
+  </div>
+
+  <div class="list">
+    <div class="item"><div class="lbl"><b>01</b>Neucha<br>Google, кириллица</div><div class="phrase f1">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>02</b>Caveat 700<br>Google, кириллица</div><div class="phrase f2">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>03</b>Marck Script<br>Google, кириллица</div><div class="phrase f3">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>04</b>Rubik Wet Paint<br>капли, гранж</div><div class="phrase f4">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>05</b>Rubik Spray Paint<br>баллон</div><div class="phrase f5">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>06</b>Rubik Marker Hatch<br>штриховка маркером</div><div class="phrase f6">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>07</b>Rubik Dirt<br>потёртость</div><div class="phrase f7">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>08</b>Rubik Beastly<br>каракули</div><div class="phrase f8">дизайн, монтаж, миры</div></div>
+    <div class="item"><div class="lbl"><b>09</b>Kosolapa Script<br>твоя, слишком аккуратная</div><div class="phrase f9">дизайн, монтаж, миры</div></div>
+  </div>
+
+  <div class="foot">Фраза везде одна и та же, кегль 72 px — сравнивать честно. Прозрачность бумаги 22%, цветной шум SVG на «наложении» 32%.</div>
+
+</div>
+</body>
+</html>

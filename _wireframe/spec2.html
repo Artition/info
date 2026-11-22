@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>СИСТЕМА v2 — варианты шрифтов</title>
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf");font-weight:400}
+  @font-face{font-family:"Lirica";src:url("fonts/Lirica.otf");font-weight:400}
+  @font-face{font-family:"Kosolapa";src:url("fonts/KosolapaScript-Regular.ttf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Bold.otf");font-weight:700}
+
+  :root{
+    --paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A;--night:#2A1258;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    width:1440px;background:var(--paper);color:var(--ink);position:relative;
+    font-family:"Montserrat",sans-serif;-webkit-font-smoothing:antialiased;
+  }
+  .paperbg{position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:url("assets/paper.png");background-size:cover;background-position:center;opacity:.42;mix-blend-mode:multiply}
+  .grain{position:absolute;inset:0;z-index:8;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("assets/paper.png");background-size:700px}
+  .halftone{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.35;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.5) 1px, transparent 1.1px);
+    background-size:6px 6px}
+  .wrap{position:relative;z-index:2}
+
+  .head{display:flex;justify-content:space-between;padding:34px 60px 0;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+  .head .r{text-align:right;letter-spacing:.06em;text-transform:none;opacity:.6;font-size:12px}
+
+  .variant{position:relative;padding:55px 60px;border-top:1px solid rgba(23,18,16,.22);margin-top:34px}
+  .variant:first-of-type{margin-top:21px}
+  .vlabel{display:flex;align-items:baseline;gap:13px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.62;margin-bottom:34px}
+  .vlabel b{color:var(--purple);letter-spacing:.1em}
+  .vlabel .cov{margin-left:auto;letter-spacing:.12em;font-size:15px;opacity:.85;text-transform:none}
+
+  .row{display:flex;justify-content:space-between;align-items:flex-start;gap:34px}
+  .name{line-height:.86;letter-spacing:-.02em;text-transform:uppercase;white-space:nowrap}
+  .sub{margin-top:21px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+  .meta{text-align:right;font-size:11px;letter-spacing:.14em;text-transform:uppercase;line-height:1.9;opacity:.65;white-space:nowrap}
+  .meta em{font-style:normal;color:var(--purple)}
+  .scr{font-family:"Kosolapa";color:var(--orange);line-height:1}
+
+  /* A — Unbounded + Kosolapa */
+  .a .name{font-family:"UnboundedX";font-weight:900;font-size:144px}
+  .a .scr{font-family:"Kosolapa";font-size:72px;color:var(--orange);line-height:1}
+  .scr{margin-top:-10px;display:block;transform:rotate(-3.5deg);transform-origin:left center;width:max-content}
+
+  /* B — Chaos16 */
+  .b .name{font-family:"Chaos16";font-size:150px;letter-spacing:0;line-height:.9}
+
+  /* C — Lirica */
+  .c .name{font-family:"Lirica";font-size:168px;letter-spacing:.01em;line-height:.88}
+  .c .sub{font-family:"UnboundedX";font-size:21px;font-weight:900;letter-spacing:.04em}
+
+  /* D — Montserrat tight */
+  .d .name{font-family:"Montserrat";font-weight:700;font-size:132px;letter-spacing:-.055em;line-height:.82}
+  .d .scr{font-family:"Kosolapa";font-size:64px;color:var(--orange);margin-left:8px}
+  .d .sub{font-family:"Montserrat";font-size:21px;letter-spacing:.02em;text-transform:none;max-width:420px;line-height:1.5}
+
+  .band{margin:0 60px 55px;height:220px;position:relative;overflow:hidden;border:2px solid var(--ink);
+    background:#120C22;display:flex;align-items:center;padding:0 34px;gap:34px}
+  .band::before{content:"";position:absolute;inset:-25%;
+    background:
+      radial-gradient(ellipse 40% 44% at 26% 32%, #6C3BFF 0%, rgba(108,59,255,0) 62%),
+      radial-gradient(ellipse 36% 40% at 74% 70%, #FF6A1A 0%, rgba(255,106,26,0) 60%),
+      radial-gradient(ellipse 55% 45% at 50% 50%, #2A1258 0%, #140E24 74%)}
+  .band{background-image:url("assets/paper.png");background-blend-mode:overlay;background-size:900px}
+  .band h3{position:relative;z-index:3;font-family:"UnboundedX";font-weight:900;font-size:55px;color:#F2EDE3;text-transform:uppercase;line-height:.95}
+  .band h3 em{font-style:normal;color:var(--orange)}
+  .band p{position:relative;z-index:3;color:#E9E3D5;opacity:.7;font-size:13px;line-height:1.6;max-width:380px}
+</style>
+</head>
+<body>
+<div class="paperbg"></div><div class="halftone"></div><div class="grain"></div>
+<div class="wrap">
+
+<div class="head">
+  <div>Система v2 · варианты шрифтов</div>
+  <div class="r">Nick: ARTITION<br>бумага 4096×2730 · реальная текстура</div>
+</div>
+
+<!-- A -->
+<section class="variant a">
+  <div class="vlabel"><b>A</b> Unbounded 900 + Kosolapa Script · текст Montserrat<span class="cov" style="font-family:UnboundedX">Аа Бб Вв Гг 0123</span></div>
+  <div class="row">
+    <div>
+      <div class="name">Artition</div>
+      <div class="scr">дизайн, монтаж, миры</div>
+      <div class="sub">дизайнер · ютубер · художник</div>
+    </div>
+    <div class="meta">01 — герой<br>13.7K <em>/</em> YouTube<br>M_0O_n</div>
+  </div>
+</section>
+
+<!-- B -->
+<section class="variant b">
+  <div class="vlabel"><b>B</b> Chaos16 · текст Montserrat<span class="cov" style="font-family:Chaos16">Аа Бб Вв Гг 0123</span></div>
+  <div class="row">
+    <div>
+      <div class="name">Artition</div>
+      <div class="sub">дизайнер · ютубер · художник</div>
+    </div>
+    <div class="meta">01 — герой<br>13.7K <em>/</em> YouTube<br>M_0O_n</div>
+  </div>
+</section>
+
+<!-- C -->
+<section class="variant c">
+  <div class="vlabel"><b>C</b> Lirica · подзаголовки Unbounded · текст Montserrat<span class="cov" style="font-family:Lirica">Аа Бб Вв Гг 0123</span></div>
+  <div class="row">
+    <div>
+      <div class="name">Artition</div>
+      <div class="sub">дизайнер · ютубер · художник</div>
+    </div>
+    <div class="meta">01 — герой<br>13.7K <em>/</em> YouTube<br>M_0O_n</div>
+  </div>
+</section>
+
+<!-- D -->
+<section class="variant d">
+  <div class="vlabel"><b>D</b> Montserrat 700 плотный трекинг + Kosolapa Script<span class="cov" style="font-family:Montserrat;font-weight:700">Аа Бб Вв Гг 0123</span></div>
+  <div class="row">
+    <div>
+      <div class="name">Artition</div>
+      <div class="sub">Рисую, монтирую и делаю миры, в которые хочется зайти.</div>
+    </div>
+    <div class="meta">01 — герой<br>13.7K <em>/</em> YouTube<br>M_0O_n</div>
+  </div>
+</section>
+
+<div class="band">
+  <h3>Тёмный<br><em>экран</em></h3>
+  <p>Мрамор с шумом и зерном реальной бумаги, а не ровный градиент. Пиксельная рамка 2 px.</p>
+</div>
+
+</div>
+</body>
+</html>

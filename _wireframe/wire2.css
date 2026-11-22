@@ -1,0 +1,127 @@
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#e6e6e6;font-family:"Segoe UI",Arial,sans-serif;color:#333}
+.board{background:#fff;position:relative;overflow:hidden}
+.board--d{width:1440px;margin:0 auto}
+.board--m{width:390px;margin:0 auto}
+
+.bar{background:#d2d2d2}
+.bar.d{background:#c2c2c2}
+.bar.ink{background:#a8a8a8}
+.ph{background:#f2f2f2;border:1px dashed #b4b4b4;position:relative}
+.ph__l{position:absolute;left:8px;top:6px;font:10px/1.2 ui-monospace,Consolas,monospace;color:#a5a5a5;letter-spacing:.08em;text-transform:uppercase}
+.cap{display:flex;justify-content:space-between;align-items:baseline;padding:12px 20px;border-bottom:1px solid #ddd;background:#fafafa}
+.cap b{font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.cap span{font:10px/1 ui-monospace,Consolas,monospace;color:#999;letter-spacing:.08em}
+.tag{font:11px/1.4 ui-monospace,Consolas,monospace;color:#a0a0a0;letter-spacing:.1em;text-transform:uppercase}
+.tag em{font-style:normal;color:#7d7d7d}
+
+/* ---------- hero, без верхней панели ---------- */
+.scene{position:relative;height:960px;padding:44px 60px 0;overflow:hidden}
+.logo{width:44px;height:56px;transform:rotate(-4deg)}
+.vnav{position:absolute;right:16px;top:120px;display:flex;flex-direction:column;gap:22px;align-items:center}
+.vnav i{display:block;width:9px;height:72px;background:#d8d8d8}
+.scene .tag{position:absolute;left:60px;top:120px}
+.name-block{margin-top:60px}
+.name-block .bar{height:152px;margin-bottom:12px}
+.n1{width:74%}
+.n2{width:103%;margin-left:-30px}
+.n3{width:52%}
+.role{width:430px;height:16px;margin-top:26px}
+.sub{width:300px;height:10px;margin-top:12px}
+.cards{position:absolute;right:20px;top:150px;width:640px;height:760px}
+.card{position:absolute;width:330px;height:440px;background:#f4f4f4}
+.c1{left:0;top:60px;transform:rotate(-13deg)}
+.c2{left:250px;top:130px;transform:rotate(8deg);z-index:2}
+.c3{left:120px;top:300px;transform:rotate(-3deg);z-index:3;background:#ededed}
+.hint{position:absolute;right:60px;bottom:40px;display:flex;align-items:center;gap:12px}
+.hint .bar{width:80px;height:8px}
+.hint .dot{width:36px;height:36px;border:1px dashed #bdbdbd;border-radius:50%}
+.note{position:absolute;font:10px/1.4 ui-monospace,Consolas,monospace;color:#adadad;letter-spacing:.06em;text-transform:uppercase;max-width:210px;text-align:right}
+
+/* ---------- ссылки: пиксельные плитки, разбросаны ---------- */
+.linksec{position:relative;padding:130px 60px 150px;border-top:1px solid #eee}
+.linksec .tag{position:absolute;left:18px;top:150px;transform-origin:left top;transform:rotate(-90deg) translate(-10px,-10px);white-space:nowrap}
+.chips{display:flex;gap:24px;align-items:flex-start;padding-left:70px;padding-right:40px;flex-wrap:nowrap;justify-content:space-between}
+.chip{width:152px;height:152px;flex:0 0 auto;position:relative;background:#f4f4f4}
+.chip span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:#dcdcdc}
+.chip:nth-child(1){transform:rotate(-7deg);margin-top:26px}
+.chip:nth-child(2){transform:rotate(4deg)}
+.chip:nth-child(3){transform:rotate(-2deg);margin-top:54px}
+.chip:nth-child(4){transform:rotate(9deg);margin-top:10px}
+.chip:nth-child(5){transform:rotate(-5deg);margin-top:40px}
+
+/* ---------- о себе ---------- */
+.about{display:grid;grid-template-columns:420px 1fr;gap:110px;padding:130px 60px 120px;position:relative;border-top:1px solid #eee}
+.about__v{position:absolute;left:18px;top:150px;transform:rotate(-90deg);transform-origin:left top;white-space:nowrap}
+.about__h .bar{height:74px;margin-bottom:12px}
+.about__h .bar:last-child{width:62%}
+.prose{display:flex;flex-direction:column;gap:13px;margin-bottom:64px}
+.prose .bar{height:13px}
+.prose .short{width:58%}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:1fr 44px;align-items:center;padding:28px 0;border-top:1px solid #ececec}
+.row:last-child{border-bottom:1px solid #ececec}
+.row__t{height:26px;width:180px;background:#d2d2d2}
+.row__h{height:10px;width:230px;margin-top:10px;background:#dfdfdf}
+.row__a{width:24px;height:24px;border:1px dashed #c4c4c4;border-radius:50%}
+
+/* ---------- видео: веер карт ---------- */
+.videos{background:#d9d9d9;padding:120px 60px 140px;position:relative;overflow:hidden}
+.videos .tag{color:#8d8d8d}
+.videos .tag em{color:#6b6b6b}
+.vhead{margin-bottom:90px;display:flex;align-items:flex-end;justify-content:space-between}
+.vhead .bar{height:86px;width:460px;background:#b4b4b4}
+.vhead .s{height:9px;width:190px;background:#c4c4c4}
+.fan{position:relative;height:640px}
+.fcard{position:absolute;width:300px;height:430px;background:#c6c6c6;border:1px dashed #adadad;transform-origin:50% 120%}
+.f1{left:40px;top:120px;transform:rotate(-16deg)}
+.f2{left:290px;top:70px;transform:rotate(-8deg)}
+.f3{left:560px;top:40px;transform:rotate(0deg);background:#bfbfbf}
+.f4{left:840px;top:70px;transform:rotate(8deg)}
+.f5{left:1080px;top:120px;transform:rotate(16deg)}
+.vmore{margin-top:40px;display:flex;align-items:center;gap:14px}
+.vmore .bar{width:210px;height:12px;background:#c4c4c4}
+.vmore .dot{width:34px;height:34px;border:1px dashed #b0b0b0;border-radius:50%}
+
+/* ---------- подвал ---------- */
+.foot{padding:120px 60px 40px}
+.foot__eye{width:190px;height:10px;margin-bottom:28px}
+.foot__mail{height:80px;width:640px;background:#d2d2d2;margin-bottom:86px}
+.foot__b{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #eee;padding-top:22px}
+.foot__b .bar{height:9px;width:210px}
+
+/* ---------- mobile ---------- */
+.m .scene{height:auto;padding:32px 20px 40px}
+.m .scene .tag{position:static;display:block;margin-bottom:28px}
+.m .vnav{display:none}
+.m .logo{width:34px;height:44px;margin-bottom:26px;transform:rotate(-4deg)}
+.m .name-block{margin-top:0}
+.m .name-block .bar{height:74px;margin-bottom:8px}
+.m .n1{width:88%}
+.m .n2{width:100%;margin-left:0}
+.m .n3{width:56%}
+.m .role{width:250px;height:12px;margin-top:20px}
+.m .sub{width:180px;height:9px}
+.m .hint{position:static;margin-top:40px}
+.m .linksec{padding:64px 20px 70px}
+.m .linksec .tag{position:static;transform:none;display:block;margin-bottom:34px}
+.m .chips{padding-left:0;gap:14px;flex-wrap:wrap}
+.m .chip{width:96px;height:96px}
+.m .chip span{width:42px;height:42px}
+.m .chip:nth-child(n){margin-top:0;transform:rotate(-4deg)}
+.m .chip:nth-child(2n){transform:rotate(5deg)}
+.m .about{display:block;padding:64px 20px 60px}
+.m .about__v{position:static;transform:none;display:block;margin-bottom:34px}
+.m .about__h .bar{height:44px}
+.m .prose{margin-bottom:44px}
+.m .row{padding:20px 0}
+.m .videos{padding:64px 20px 70px}
+.m .vhead{margin-bottom:40px}
+.m .vhead .bar{height:48px;width:220px}
+.m .fan{height:auto}
+.m .fcard{position:relative;width:100%;height:210px;margin-bottom:18px;transform:none;left:auto;top:auto}
+.m .foot{padding:64px 20px 28px}
+.m .foot__mail{height:46px;width:280px;margin-bottom:48px}
+.m .foot__b{display:block}
+.m .foot__b .bar{margin-bottom:10px}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>МАТЕРИАЛ v3 — дизеринг</title>
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;background:var(--paper);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
+
+  .dark{position:relative;height:920px;background:#0C0718;overflow:hidden;padding:55px 60px}
+  .dark::before{content:"";position:absolute;inset:-20%;
+    background:
+      radial-gradient(ellipse 42% 40% at 22% 26%, rgba(108,59,255,.5) 0%, rgba(108,59,255,0) 62%),
+      radial-gradient(ellipse 38% 44% at 78% 76%, rgba(255,106,26,.4) 0%, rgba(255,106,26,0) 60%);
+    filter:blur(22px)}
+  #dust{position:absolute;inset:0;width:1440px;height:920px}
+  .dhead{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:baseline;
+    color:#EFE9DC;font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+  .dhead .r{font-family:"Chaos16";font-size:24px;letter-spacing:.02em;text-transform:none;opacity:.85}
+  .dtitle{position:relative;z-index:3;margin-top:21px;color:#F2EDE3;font-family:"UnboundedX";font-weight:900;
+    font-size:55px;line-height:.95;text-transform:uppercase;letter-spacing:-.01em}
+  .dtitle em{font-style:normal;color:var(--orange)}
+
+  .cards{position:relative;z-index:3;display:flex;gap:34px;margin-top:55px}
+  .card{width:386px}
+  .art{position:relative;height:386px;overflow:hidden;background:#0C0718;filter:url(#torn)}
+  .art canvas{position:relative;display:block;width:386px;height:386px}
+  .cap{margin-top:21px;color:#EFE9DC}
+  .cap b{display:block;font-family:"UnboundedX";font-weight:900;font-size:18px;line-height:1.15;text-transform:uppercase}
+  .cap span{display:block;margin-top:7px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
+  .cap i{display:block;margin-top:9px;font-style:normal;font-size:11px;letter-spacing:.09em;opacity:.5}
+
+  .note{position:absolute;z-index:4;right:60px;bottom:55px;font-family:"Chaos16";font-size:24px;
+    color:var(--orange);text-align:right;line-height:1.4}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="torn" x="-12%" y="-12%" width="124%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="3" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<section class="dark">
+  <canvas id="dust"></canvas>
+  <div class="dhead"><div>Материал v3 · дизеринг бейера</div><div class="r">4 краски · 2 бита</div></div>
+  <div class="dtitle">Дизеринг<br><em>вместо</em> полутона</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="art"><canvas id="c1" width="386" height="386"></canvas></div>
+      <div class="cap"><b>Ячейка 2 px</b><span>4 уровня</span><i>фиолет → оранж, цифра внутри дизера</i></div>
+    </div>
+    <div class="card">
+      <div class="art"><canvas id="c2" width="386" height="386"></canvas></div>
+      <div class="cap"><b>Ячейка 3 px</b><span>2 уровня</span><i>жёсткий 1-бит, как в газете</i></div>
+    </div>
+    <div class="card">
+      <div class="art"><canvas id="c3" width="386" height="386"></canvas></div>
+      <div class="cap"><b>Ячейка 3 px</b><span>3 уровня</span><i>bayer 8×8, крупная точка</i></div>
+    </div>
+  </div>
+
+  <div class="note">точка дизера,<br>а не сетка полутона</div>
+</section>
+
+<script>
+const B4=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+const B8=[[0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],
+[60,28,52,20,62,30,54,22],[3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],
+[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21]];
+
+function ramp(t,stops){
+  for(let i=1;i<stops.length;i++){
+    if(t<=stops[i][0]){
+      const a=stops[i-1],b=stops[i],k=(t-a[0])/(b[0]-a[0]||1);
+      return [a[1][0]+(b[1][0]-a[1][0])*k,a[1][1]+(b[1][1]-a[1][1])*k,a[1][2]+(b[1][2]-a[1][2])*k];
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+/* маска: крупный текст, который тоже уйдёт в дизер */
+function maskText(w,h,txt,size){
+  const m=document.createElement('canvas'); m.width=w; m.height=h;
+  const mx=m.getContext('2d');
+  mx.fillStyle='#000'; mx.fillRect(0,0,w,h);
+  mx.fillStyle='#fff'; mx.font='900 '+size+'px UnboundedX, sans-serif';
+  mx.textAlign='center'; mx.textBaseline='middle';
+  mx.fillText(txt,w/2,h/2+size*0.04);
+  return mx.getImageData(0,0,w,h).data;
+}
+
+function dither(id,{cell,levels,stops,matrix,field,txt,size=150,ink=0.82}){
+  const c=document.getElementById(id), ctx=c.getContext('2d'), w=c.width, h=c.height;
+  const mask=maskText(w,h,txt,size);
+  const img=ctx.createImageData(w,h), d=img.data, Mn=matrix.length, N=Mn*Mn;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    const mi=(y*w+x)*4, m=mask[mi]/255;
+    let v=field(x/w,y/h);
+    v=v*(1-m*ink);                                    // буква темнее фона
+    const th=(matrix[((y/cell)|0)%Mn][((x/cell)|0)%Mn]+0.5)/N;
+    v=Math.round(Math.min(1,Math.max(0,v+(th-0.5)/levels))*(levels-1))/(levels-1);
+    const col=ramp(v,stops), i=mi;
+    d[i]=col[0]; d[i+1]=col[1]; d[i+2]=col[2]; d[i+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+const NIGHT=[14,7,24],MID=[42,18,88],PUR=[108,59,255],ORG=[255,106,26],PAP=[233,227,213];
+
+dither('c1',{cell:2,levels:4,matrix:B4,txt:'01',
+  stops:[[0,NIGHT],[.32,MID],[.6,PUR],[.84,ORG],[1,PAP]],
+  field:(u,v)=>Math.min(1,Math.max(0,.72-.72*Math.hypot(u-.34,v-.3)+.5*Math.max(0,1-Math.hypot(u-.76,v-.74)*1.6)))});
+
+dither('c2',{cell:3,levels:2,matrix:B4,txt:'02',ink:.9,
+  stops:[[0,[16,8,32]],[1,PAP]],
+  field:(u,v)=>Math.min(1,Math.max(0,.95-Math.hypot(u-.5,v-.42)*1.15))});
+
+dither('c3',{cell:3,levels:3,matrix:B8,txt:'03',
+  stops:[[0,[10,6,20]],[.5,[70,32,150]],[1,[255,140,60]]],
+  field:(u,v)=>Math.min(1,Math.max(0,.9-.82*Math.hypot(u-.3,v-.72)+.3*Math.sin(u*6+v*4)))});
+
+/* пыль */
+const cvs=document.getElementById('dust'), ctx2=cvs.getContext('2d');
+const dpr=window.devicePixelRatio||1; cvs.width=1440*dpr; cvs.height=920*dpr; ctx2.scale(dpr,dpr);
+const parts=[]; for(let i=0;i<90;i++) parts.push({x:Math.random()*1440,y:Math.random()*920,r:Math.random()*1.6+.4,s:Math.random()*.25+.05,a:Math.random()*.6+.12});
+(function loop(){ ctx2.clearRect(0,0,1440,920);
+  for(const p of parts){ p.y-=p.s; p.x+=Math.sin((p.y+p.r*90)/120)*.25; if(p.y<-6){p.y=926;p.x=Math.random()*1440;}
+    ctx2.beginPath(); ctx2.fillStyle='rgba(233,227,213,'+p.a+')'; ctx2.arc(p.x,p.y,p.r,0,7); ctx2.fill(); }
+  requestAnimationFrame(loop); })();
+
+let seed=7; setInterval(()=>{ seed=(seed%40)+1;
+  document.querySelector('#torn feTurbulence').setAttribute('seed',seed); },125);
+</script>
+</body>
+</html>

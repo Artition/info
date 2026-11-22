@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ГЕРОЙ v3 — афиша снизу</title>
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;background:var(--paper);color:var(--ink);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
+
+  .hero{position:relative;height:1000px;overflow:hidden}
+  .paperbg{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:cover;background-position:center;
+    opacity:.22;mix-blend-mode:multiply}
+  .halftone{position:absolute;inset:0;opacity:.22;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
+  .colornoise{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:.32;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='300' height='300' filter='url(%23c)'/></svg>");
+    background-size:300px}
+
+  .top{position:absolute;left:60px;right:60px;top:55px;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
+  .mark{display:flex;align-items:center;gap:13px}
+  .mark .fl{width:30px;height:60px;background:var(--ink);
+    -webkit-mask:url("assets/flame.svg") center/contain no-repeat;mask:url("assets/flame.svg") center/contain no-repeat}
+  .mark .wm{font-family:"UnboundedX";font-weight:900;font-size:12px;letter-spacing:.3em;text-transform:uppercase}
+  .meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;line-height:2.1;text-align:right;opacity:.75}
+  .meta em{font-style:normal;color:var(--purple)}
+
+  .poster{position:absolute;left:60px;right:60px;bottom:120px;z-index:2}
+  .tag{font-family:"Chaos16";font-size:34px;line-height:1;color:var(--purple);margin-bottom:21px}
+  .name{font-family:"UnboundedX";font-weight:900;font-size:212px;line-height:.78;letter-spacing:-.035em;
+    text-transform:uppercase;white-space:nowrap}
+
+  .bar{position:absolute;left:60px;right:60px;bottom:55px;z-index:2;display:flex;align-items:center;gap:34px}
+  .role{font-size:11px;letter-spacing:.2em;text-transform:uppercase;line-height:1.6;flex:1;opacity:.8}
+  .role i{font-style:normal;color:var(--purple)}
+
+  .socials{display:flex;gap:11px;flex:0 0 auto}
+  .soc{position:relative;width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+    color:var(--paper);isolation:isolate}
+  .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1;
+    transition:background .2s ease}
+  .soc svg{width:26px;height:26px;display:block}
+  .soc.vk{font-family:"Chaos16";font-size:21px;line-height:1}
+  .soc:hover::before{background:var(--purple)}
+  .soc:hover{transform:translateY(-2px)}
+
+  .scroll{font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.6;flex:0 0 auto;display:flex;align-items:center;gap:9px}
+  .scroll .arw{width:26px;height:26px;border:2px solid var(--ink);border-radius:50%;position:relative}
+  .scroll .arw::after{content:"";position:absolute;left:50%;top:7px;width:2px;height:10px;background:var(--ink);transform:translateX(-50%)}
+  .scroll .arw::before{content:"";position:absolute;left:50%;top:12px;width:5px;height:5px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:translateX(-50%) rotate(45deg)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="torn" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="9" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="hero">
+  <div class="paperbg"></div><div class="halftone"></div>
+
+  <div class="top">
+    <div class="mark"><div class="fl"></div><div class="wm">Artition</div></div>
+    <div class="meta">01 <em>/</em> герой<br>M_0O_n <em>·</em> youtube</div>
+  </div>
+
+  <div class="poster">
+    <div class="tag">дизайн, монтаж, миры</div>
+    <div class="name">Artition</div>
+  </div>
+
+  <div class="bar">
+    <div class="role">дизайнер <i>·</i> ютубер <i>·</i> художник</div>
+
+    <div class="socials">
+      <div class="soc" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 20H4v-2h16v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12ZM12 9h-2v6h2v2H8V7h4v2Zm3 6h-3v-2h3v2Zm2-2h-2v-2h2v2Zm-2-2h-3V9h3v2Zm5-5H4V4h16v2Z"/></svg></div>
+      <div class="soc" title="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 23H5V21H19V23ZM5 21H3V19H5V21ZM21 21H19V19H21V21ZM3 19H1V5H3V19ZM17 19H15V17H11V15H15V7H12V5H17V19ZM23 19H21V5H23V19ZM13 11V13H11V15H9V17H7V13H9V11H13ZM7 13H4V11H7V13ZM9 11H7V9H9V11ZM12 9H9V7H12V9ZM5 5H3V3H5V5ZM21 5H19V3H21V5ZM19 3H5V1H19V3Z"/></svg></div>
+      <div class="soc vk" title="VK">VK</div>
+      <div class="soc" title="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21H5v-2h4v2Zm10 0h-4v-2h4v2Zm-10-2H5v-2h4v2Zm10 0h-4v-2h4v2ZM5 17H3v-4h2v4Zm16 0h-2v-4h2v4Zm-2-4h-2v-2h2v2ZM7 13H5v-2h2v2Zm10-2h2v2h-2v-2ZM7 11H5V9h2v2Zm12 0h-2V9h2v2ZM9 9H7V7h2v2Zm6 0h-2V7h2v2Zm2-2h-2V5h2v2ZM9 7H7V5h2v2Z"/></svg></div>
+      <div class="soc" title="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 22H7v-2h8v2Zm-8-2H5v-2h2v2Zm10-2h-2v-2h2v2Zm-8 0H7v-2h2v2Zm-2-2H5v-6h2v6Zm10-4h-4V4h4v2h-2v6h2v2ZM7 12H5V8h2v4Zm12-4h-2V6h2v2ZM9 6H7V4h2v2Z"/></svg></div>
+    </div>
+
+    <div class="scroll"><div class="arw"></div>листай</div>
+  </div>
+  <div class="colornoise"></div>
+</div>
+
+</body>
+</html>

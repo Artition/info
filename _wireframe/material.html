@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>МАТЕРИАЛ — вырезка, полутон, частицы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Bold.otf");font-weight:700}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;background:var(--paper);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
+
+  /* ───── тёмная сцена ───── */
+  .dark{position:relative;height:900px;background:#0C0718;overflow:hidden;padding:55px 60px}
+  .dark::before{content:"";position:absolute;inset:-20%;
+    background:
+      radial-gradient(ellipse 42% 40% at 22% 26%, rgba(108,59,255,.55) 0%, rgba(108,59,255,0) 62%),
+      radial-gradient(ellipse 38% 44% at 78% 76%, rgba(255,106,26,.45) 0%, rgba(255,106,26,0) 60%);
+    filter:blur(20px)}
+  #dust{position:absolute;inset:0;width:1440px;height:900px}
+  .dhead{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:baseline;
+    color:#EFE9DC;font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+  .dhead .r{font-family:"Chaos16";font-size:17px;letter-spacing:.06em;text-transform:none;opacity:.8}
+  .dtitle{position:relative;z-index:3;margin-top:21px;color:#F2EDE3;
+    font-family:"UnboundedX";font-weight:900;font-size:55px;line-height:.95;text-transform:uppercase;letter-spacing:-.01em}
+  .dtitle em{font-style:normal;color:var(--orange)}
+
+  .cards{position:relative;z-index:3;display:flex;gap:34px;margin-top:55px}
+  .card{position:relative;width:380px}
+  .card .art{position:relative;height:380px;overflow:hidden;background:#241540;
+    filter:url(#torn)}
+  .card .art .img{position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 30% 26%, #FF6A1A 0%, rgba(255,106,26,0) 55%),
+      radial-gradient(circle at 74% 78%, #6C3BFF 0%, rgba(108,59,255,0) 60%),
+      linear-gradient(160deg,#2A1258,#0C0718)}
+  .card .art .halft{position:absolute;inset:0;mix-blend-mode:overlay;opacity:.85;
+    background-image:radial-gradient(circle at center, rgba(255,255,255,.9) 1.4px, transparent 1.5px);
+    background-size:5px 5px}
+  .card .art .big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:"UnboundedX";font-weight:900;font-size:132px;color:rgba(12,7,24,.62);letter-spacing:-.04em}
+  .card .cap{margin-top:21px;color:#EFE9DC}
+  .card .cap b{display:block;font-family:"UnboundedX";font-weight:900;font-size:19px;line-height:1.15;text-transform:uppercase;letter-spacing:-.01em}
+  .card .cap span{display:block;margin-top:7px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--purple)}
+  .card .cap i{display:block;margin-top:9px;font-style:normal;font-size:11px;letter-spacing:.1em;opacity:.5}
+
+  .note{position:absolute;z-index:4;right:60px;bottom:55px;font-family:"Marck Script";font-size:34px;
+    color:var(--orange);transform:rotate(-2deg);text-align:right;line-height:1.25}
+
+  /* ───── светлая полоса: та же вырезка на бумаге ───── */
+  .light{position:relative;height:420px;padding:55px 60px;overflow:hidden}
+  .light .paperbg{position:absolute;inset:0;background-image:url("assets/paper.png");
+    background-size:cover;opacity:.22;mix-blend-mode:multiply}
+  .lhead{position:relative;z-index:2;font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.6}
+  .lrow{position:relative;z-index:2;display:flex;gap:34px;margin-top:34px;align-items:flex-start}
+  .cut{width:340px;height:220px;background:var(--ink);filter:url(#torn2);
+    display:flex;align-items:center;justify-content:center;color:var(--paper);
+    font-family:"UnboundedX";font-weight:900;font-size:34px;text-transform:uppercase;letter-spacing:-.01em}
+  .cut.p{background:var(--purple);color:#fff}
+  .cut.o{background:var(--orange);color:var(--ink)}
+  .lcap{position:relative;z-index:2;margin-top:21px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+</style>
+</head>
+<body>
+
+<!-- SVG-фильтры: шумовое смещение кромки -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="torn" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence id="t1" type="fractalNoise" baseFrequency="0.014" numOctaves="3" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="torn2" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence id="t2" type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<section class="dark">
+  <canvas id="dust"></canvas>
+  <div class="dhead"><div>Материал · вырезка + полутон + пыль</div><div class="r">seed 8 fps</div></div>
+  <div class="dtitle">Любимые<br><em>песни</em></div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="art"><div class="img"></div><div class="halft"></div><div class="big">01</div></div>
+      <div class="cap"><b>Рок-звезда должна умереть</b><span>Lida</span><i>тёмная карточка · кромка шумит</i></div>
+    </div>
+    <div class="card">
+      <div class="art"><div class="img"></div><div class="halft"></div><div class="big">02</div></div>
+      <div class="cap"><b>Перезавоз</b><span>Lida</span><i>полутон 5 px · duotone</i></div>
+    </div>
+    <div class="card">
+      <div class="art"><div class="img"></div><div class="halft"></div><div class="big">03</div></div>
+      <div class="cap"><b>Этаю весной</b><span>nyan.mp3</span><i>частицы поверх, 40 шт</i></div>
+    </div>
+  </div>
+
+  <div class="note">семя шума<br>меняется 8 раз в секунду</div>
+</section>
+
+<section class="light">
+  <div class="paperbg"></div>
+  <div class="lhead">Та же вырезка на бумаге — для светлых блоков</div>
+  <div class="lrow">
+    <div class="cut">вырезка</div>
+    <div class="cut p">фиолет</div>
+    <div class="cut o">оранж</div>
+  </div>
+  <div class="lcap">масштаб смещения 10 px · зерно бумаги 22% · цветной шум 32%</div>
+</section>
+
+<script>
+// пыль
+const cvs = document.getElementById('dust');
+const ctx = cvs.getContext('2d');
+function fit(){ const d = window.devicePixelRatio||1; cvs.width = 1440*d; cvs.height = 900*d; ctx.scale(d,d); }
+fit();
+const N = 90, parts = [];
+for (let i=0;i<N;i++) parts.push({x:Math.random()*1440, y:Math.random()*900, r:Math.random()*1.6+.4, s:Math.random()*.25+.05, a:Math.random()*.6+.15});
+(function loop(){
+  ctx.clearRect(0,0,1440,900);
+  for (const p of parts){
+    p.y -= p.s; p.x += Math.sin((p.y+p.r*90)/120)*.25;
+    if (p.y < -6){ p.y = 906; p.x = Math.random()*1440; }
+    ctx.beginPath(); ctx.fillStyle = 'rgba(233,227,213,'+p.a+')';
+    ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+  }
+  requestAnimationFrame(loop);
+})();
+
+// анимация кромки: смена семени
+let seed = 7;
+setInterval(()=>{ seed = (seed % 40) + 1;
+  document.getElementById('t1').setAttribute('seed', seed);
+  document.getElementById('t2').setAttribute('seed', (seed % 12) + 1);
+}, 125);
+</script>
+</body>
+</html>

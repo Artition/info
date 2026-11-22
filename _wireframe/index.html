@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ПЕРВЫЙ ЭКРАН — сплит 50/50</title>
+<style>
+  @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900}
+  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400}
+  @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf")}
+  :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A;--night:#0C0718}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1440px;background:var(--paper);color:var(--ink);font-family:"Montserrat";-webkit-font-smoothing:antialiased}
+
+  .screen{position:relative;display:grid;grid-template-columns:1fr 1fr;height:1000px;overflow:hidden}
+
+  /* ── фоновые панели: под кубом ── */
+  .paperPanel{position:absolute;left:0;top:0;width:744px;height:1000px;overflow:hidden;z-index:0}
+  .paperPanel .paperbg{position:absolute;inset:0;background-image:url("assets/paper.png");
+    background-size:135% 135%;background-position:center;opacity:.22;mix-blend-mode:multiply}
+  .paperPanel .halftone{position:absolute;inset:0;opacity:.2;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
+  .bgPanel{position:absolute;left:720px;top:0;width:720px;height:1000px;background:var(--night);overflow:hidden;z-index:0}
+  .bgPanel #bg{position:absolute;inset:0;width:100%;height:100%}
+  .bgPanel .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,5,32,.32) 0%,rgba(10,5,32,.66) 55%,rgba(10,5,32,.92) 100%)}
+
+  /* ── левая половина: имя поверх бумаги ── */
+  .left{position:relative;z-index:2;padding:55px 55px 55px 60px;
+    display:flex;flex-direction:column}
+
+  .mark{position:relative;z-index:4;display:flex;align-items:center;gap:13px}
+  .mark svg{width:30px;height:60px;display:block}
+  .mark .wm{font-family:"UnboundedX";font-weight:900;font-size:12px;letter-spacing:.3em;text-transform:uppercase}
+
+  .poster{position:relative;z-index:4;margin-top:auto}
+  .plate{position:relative;display:block;overflow:visible}
+  .plate .nm text{font-family:"UnboundedX";font-weight:900;font-size:138px;letter-spacing:-4.8px;fill:var(--ink)}
+
+  #flame{position:absolute;left:-320px;top:-10px;width:500px;height:1000px;image-rendering:pixelated;z-index:1;
+    transform:rotate(-3deg) scaleX(-1)}
+
+  /* ── куб: чёрно-белый дизер ── */
+  .cubeWrap{position:absolute;left:50%;top:500px;transform:translate(-50%,-50%);width:1200px;height:1200px;z-index:1;pointer-events:none}
+  .cubeWrap canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+
+  .soc-bar{position:relative;z-index:4;display:flex;gap:9px;margin-top:22px}
+  .soc{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--paper);isolation:isolate}
+  .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1}
+  .soc svg{width:17px;height:17px;display:block;position:relative;z-index:2}
+  .soc.vk{font-family:"Chaos16";font-size:15px;position:relative;z-index:2}
+
+  /* ── правая половина: экран ── */
+  /* ── правая половина: тексты поверх куба ── */
+  .right{position:relative;z-index:2;color:#EFE9DC;padding:55px 60px 55px 55px;
+    display:flex;flex-direction:column}
+
+  .about{position:relative;z-index:3;margin-top:86px}
+  .about .lead{font-family:"UnboundedX";font-weight:900;font-size:34px;line-height:1.05;text-transform:uppercase;
+    letter-spacing:-.01em;margin-bottom:21px}
+  .about .lead em{font-style:normal;color:var(--orange)}
+  .about p{font-size:15px;line-height:1.62;max-width:470px;opacity:.86;margin-bottom:13px}
+
+  /* треки — бумажные карточки поверх экрана */
+  .tracks{position:relative;z-index:3;margin-top:auto}
+  .tlabel{font-family:"Chaos16";font-size:21px;letter-spacing:.02em;opacity:.8;margin-bottom:21px}
+  .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
+  .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink)}
+  .track::before{content:"";position:absolute;inset:0;background:var(--paper);filter:url(#torn);z-index:-1}
+  .cov{position:relative;aspect-ratio:1/1;overflow:hidden;background:#120B24}
+  .cov canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+  .cov .no{position:absolute;left:6px;top:4px;font-family:"Chaos16";font-size:19px;color:var(--paper);
+    text-shadow:0 1px 0 rgba(0,0,0,.35)}
+  .track b{display:block;margin-top:9px;font-size:12.5px;line-height:1.25;font-weight:400}
+  .track i{display:block;margin-top:3px;font-family:"Chaos16";font-style:normal;font-size:15px;color:var(--purple)}
+
+  /* ── карточки: 3D-наклон за курсором ── */
+  .track,.vcard{transform:perspective(700px) rotate(var(--rot,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--tz,0px));
+    transition:transform .18s ease-out;will-change:transform}
+  .track{--rot:-1.6deg}
+  .track:nth-child(2){--rot:1.2deg}
+  .track:nth-child(3){--rot:-.8deg}
+  .track .foil,.vcard .foil{position:absolute;inset:0;z-index:3;opacity:0;transition:opacity .25s;pointer-events:none;
+    background:linear-gradient(115deg,transparent 12%,rgba(0,255,170,.55) 27%,rgba(255,0,190,.55) 41%,rgba(120,80,255,.55) 55%,rgba(255,180,0,.5) 69%,transparent 85%);
+    background-size:240% 240%;background-position:var(--fx,50%) var(--fy,50%);mix-blend-mode:overlay}
+  .track:hover .foil,.vcard:hover .foil{opacity:1}
+
+  /* ── секция «видео» на бумаге ── */
+  .paperSec{position:relative;padding:89px 60px 89px;background:var(--paper);overflow:hidden}
+  .paperSec>.tex{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:135% auto;opacity:.22;mix-blend-mode:multiply;pointer-events:none}
+  .paperSec>.dots{position:absolute;inset:0;opacity:.16;pointer-events:none;
+    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
+  .paperSec>*{position:relative}
+  .vhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:55px}
+  .vhead h2{font-family:"UnboundedX";font-weight:900;font-size:89px;line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
+  .vnote{font-family:"Chaos16";font-size:21px;color:var(--purple);text-align:right;line-height:1.2}
+  .vnote small{display:block;font-family:"Montserrat";font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(23,18,16,.5);margin-top:7px}
+  .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .vcard{position:relative;isolation:isolate;display:block;padding:9px 9px 13px;color:#EFE9DC;text-decoration:none}
+  .vcard::before{content:"";position:absolute;inset:0;background:var(--night);filter:url(#torn);z-index:-1}
+  .shot{position:relative;aspect-ratio:16/9;overflow:hidden;background:#120B24}
+  .shot canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+  .shot .dur{position:absolute;right:7px;bottom:6px;font-family:"Chaos16";font-size:14px;color:var(--paper)}
+  .vcard h3{font-size:14.5px;line-height:1.3;font-weight:400;margin-top:10px;max-width:94%}
+  .vmeta{display:flex;justify-content:space-between;align-items:baseline;margin-top:7px;
+    font-family:"Chaos16";font-size:15px;color:var(--orange)}
+  .vmeta span{font-family:"Montserrat";font-size:11px;letter-spacing:.1em;color:rgba(239,233,220,.45)}
+
+  /* ── подвал ── */
+  .foot{position:relative;background:var(--night);color:#EFE9DC;padding:89px 60px 34px;overflow:hidden}
+  .foot>.grain{position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background:radial-gradient(120% 90% at 78% -10%, rgba(108,59,255,.55) 0%, rgba(12,7,24,0) 62%)}
+  .foot>*{position:relative}
+  .foot .fh{font-family:"Chaos16";font-size:21px;color:rgba(239,233,220,.6)}
+  .mail{display:inline-block;margin:13px 0 55px;font-family:"UnboundedX";font-weight:900;font-size:89px;
+    letter-spacing:-.035em;color:#EFE9DC;text-decoration:none;transition:color .2s}
+  .mail em{font-style:normal;color:var(--orange)}
+  .mail:hover{color:var(--purple)}
+  .mail:hover em{color:#EFE9DC}
+  .fl{display:flex;gap:34px;font-family:"Chaos16";font-size:17px;margin-bottom:89px}
+  .fl a{color:rgba(239,233,220,.72);text-decoration:none;transition:color .2s}
+  .fl a:hover{color:var(--orange)}
+  .print{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:rgba(239,233,220,.42);border-top:1px solid rgba(239,233,220,.16);padding-top:21px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="torn" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="5" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="screen">
+  <div class="paperPanel">
+    <div class="paperbg"></div><div class="halftone"></div>
+    <canvas id="flame" width="160" height="320"></canvas>
+  </div>
+
+  <div class="bgPanel">
+    <canvas id="bg"></canvas>
+    <div class="veil"></div>
+  </div>
+
+  <div class="cubeWrap"><canvas id="cube" width="200" height="200"></canvas></div>
+
+  <div class="left">
+
+    <div class="mark">
+      <svg viewBox="0 0 4 8" shape-rendering="crispEdges" fill="currentColor">
+        <rect x="1" y="0" width="1" height="1"/><rect x="1" y="1" width="2" height="3"/>
+        <rect x="0" y="4" width="3" height="1"/><rect x="0" y="5" width="4" height="1"/>
+        <rect x="0" y="6" width="4" height="1"/><rect x="0" y="7" width="4" height="1"/>
+      </svg>
+      <div class="wm">Artition</div>
+    </div>
+
+    <div class="poster">
+      <svg class="plate" viewBox="0 -45 520 285" width="520" height="285" aria-label="Artition">
+        <defs>
+          <mask id="cutTag" maskUnits="userSpaceOnUse" x="-60" y="-60" width="640" height="360">
+            <rect x="-60" y="-60" width="640" height="360" fill="#fff"/>
+            <g id="maskLetters" fill="#000" stroke="#000" stroke-width="20" stroke-linejoin="round"
+               font-family="Chaos16" font-size="44" xml:space="preserve"></g>
+          </mask>
+        </defs>
+        <g class="nm" mask="url(#cutTag)">
+          <text x="0" y="105" xml:space="preserve">ARTI</text>
+          <text x="0" y="215" xml:space="preserve">TION</text>
+        </g>
+        <g id="tagLetters" fill="var(--purple)" font-family="Chaos16" font-size="44" xml:space="preserve"></g>
+      </svg>
+      <div class="soc-bar">
+        <div class="soc" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 20H4v-2h16v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12ZM12 9h-2v6h2v2H8V7h4v2Zm3 6h-3v-2h3v2Zm2-2h-2v-2h2v2Zm-2-2h-3V9h3v2Zm5-5H4V4h16v2Z"/></svg></div>
+        <div class="soc" title="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 23H5V21H19V23ZM5 21H3V19H5V21ZM21 21H19V19H21V21ZM3 19H1V5H3V19ZM17 19H15V17H11V15H15V7H12V5H17V19ZM23 19H21V5H23V19ZM13 11V13H11V15H9V17H7V13H9V11H13ZM7 13H4V11H7V13ZM9 11H7V9H9V11ZM12 9H9V7H12V9ZM5 5H3V3H5V5ZM21 5H19V3H21V5ZM19 3H5V1H19V3Z"/></svg></div>
+        <div class="soc vk" title="VK">VK</div>
+        <div class="soc" title="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21H5v-2h4v2Zm10 0h-4v-2h4v2Zm-10-2H5v-2h4v2Zm10 0h-4v-2h4v2ZM5 17H3v-4h2v4Zm16 0h-2v-4h2v4Zm-2-4h-2v-2h2v2ZM7 13H5v-2h2v2Zm10-2h2v2h-2v-2ZM7 11H5V9h2v2Zm12 0h-2V9h2v2ZM9 9H7V7h2v2Zm6 0h-2V7h2v2Zm2-2h-2V5h2v2ZM9 7H7V5h2v2Z"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="about">
+      <div class="lead">делаю <em>картинки</em>,<br>миры и видео</div>
+      <p>Пишу и рисую для Minecraft: контент, обложки, айдентика серверов. Веду канал и снимаю то, что сам хотел бы смотреть.</p>
+      <p>Тут — всё, что я делаю, ссылки и последние видео.</p>
+    </div>
+
+    <div class="tracks">
+      <div class="tlabel">под это всё делалось</div>
+      <div class="trow">
+        <div class="track">
+          <div class="cov"><canvas id="t1" width="120" height="120"></canvas><div class="no">01</div></div>
+          <b>Название трека</b><i>автор</i>
+          <div class="foil"></div>
+        </div>
+        <div class="track">
+          <div class="cov"><canvas id="t2" width="120" height="120"></canvas><div class="no">02</div></div>
+          <b>Название трека</b><i>автор</i>
+          <div class="foil"></div>
+        </div>
+        <div class="track">
+          <div class="cov"><canvas id="t3" width="120" height="120"></canvas><div class="no">03</div></div>
+          <b>Название трека</b><i>автор</i>
+          <div class="foil"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="paperSec vsec">
+  <div class="tex"></div><div class="dots"></div>
+
+  <div class="vhead">
+    <h2>Видео</h2>
+    <div class="vnote">последние шесть<small>канал M_0_O_n · подтягивается само</small></div>
+  </div>
+
+  <div class="vgrid">
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v1" width="384" height="216"></canvas><span class="dur">14:02</span><div class="foil"></div></div>
+      <h3>Поднял сервер ТОМ с нуля — полная экскурсия</h3>
+      <div class="vmeta"><span>3 недели назад</span><b>142K</b></div>
+    </a>
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v2" width="384" height="216"></canvas><span class="dur">08:41</span><div class="foil"></div></div>
+      <h3>Мой пиксель-арт: от скетча на бумаге до обложки</h3>
+      <div class="vmeta"><span>месяц назад</span><b>98K</b></div>
+    </a>
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v3" width="384" height="216"></canvas><span class="dur">21:18</span><div class="foil"></div></div>
+      <h3>Как я анимирую трейлеры внутри Minecraft</h3>
+      <div class="vmeta"><span>месяц назад</span><b>210K</b></div>
+    </a>
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v4" width="384" height="216"></canvas><span class="dur">11:37</span><div class="foil"></div></div>
+      <h3>Десять обложек за один вечер — челлендж</h3>
+      <div class="vmeta"><span>2 месяца назад</span><b>76K</b></div>
+    </a>
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><span class="dur">17:55</span><div class="foil"></div></div>
+      <h3>Айдентика сервера за сутки: бриф, эскизы, финал</h3>
+      <div class="vmeta"><span>3 месяца назад</span><b>54K</b></div>
+    </a>
+    <a class="vcard" href="#">
+      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><span class="dur">26:30</span><div class="foil"></div></div>
+      <h3>Разбираю старые работы — что бы я сделал иначе</h3>
+      <div class="vmeta"><span>4 месяца назад</span><b>61K</b></div>
+    </a>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="grain"></div>
+  <div class="fh">написать мне</div>
+  <a class="mail" href="mailto:hi@artition.ru">hi@<em>artition</em>.ru</a>
+  <div class="fl">
+    <a href="#">telegram</a><a href="#">youtube</a><a href="#">discord</a><a href="#">vk</a>
+  </div>
+  <div class="print"><span>© 2026 Artition</span><span>сделано руками, без шаблонов</span></div>
+</footer>
+
+<script>
+/* ── шум ── */
+function hash(x,y,s){ let n=x*374761393+y*668265263+s*1442695040888963407; n=(n^(n>>13))*1274126177; return ((n^(n>>16))>>>0)/4294967295; }
+function vnoise(x,y,s){ const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+  const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);
+  const a=hash(xi,yi,s),b=hash(xi+1,yi,s),c=hash(xi,yi+1,s),d=hash(xi+1,yi+1,s);
+  return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v; }
+function fbm(x,y,s){ return vnoise(x,y,s)*.62+vnoise(x*2.1,y*2.1,s+11)*.27+vnoise(x*4.3,y*4.3,s+29)*.11; }
+
+const B4=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+function ramp(t,st){ for(let i=1;i<st.length;i++){ if(t<=st[i][0]){ const a=st[i-1],b=st[i],k=(t-a[0])/(b[0]-a[0]);
+  return [a[1][0]+(b[1][0]-a[1][0])*k,a[1][1]+(b[1][1]-a[1][1])*k,a[1][2]+(b[1][2]-a[1][2])*k]; } } return st[st.length-1][1]; }
+
+/* ── пламя: маска логотипа, рваная кромка, крупный дизер ── */
+const FLAME=[".1..",".11.",".11.",".11.","111.","1111","1111","1111"];
+const fc=document.getElementById('flame'), FW=160, FH=320, NC=4, NR=8;
+const mask=new Float32Array(FW*FH), cw=FW/NC, ch=FH/NR;
+for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
+  const c=Math.min(3,(x/cw)|0), r=Math.min(7,(y/ch)|0);
+  mask[y*FW+x]=FLAME[r][c]==='1'?1:0;
+}
+function blur(src,w,h,r){ const tmp=new Float32Array(w*h),out=new Float32Array(w*h);
+  for(let y=0;y<h;y++){ let acc=0; for(let x=-r;x<w+r;x++){ const xa=Math.min(w-1,Math.max(0,x+r)),xr=Math.min(w-1,Math.max(0,x-r-1));
+    acc+=src[y*w+xa]-(x-r-1>=0?src[y*w+xr]:0); tmp[y*w+Math.min(w-1,Math.max(0,x))]=acc/(2*r+1); } }
+  for(let x=0;x<w;x++){ let acc=0; for(let y=-r;y<h+r;y++){ const ya=Math.min(h-1,Math.max(0,y+r)),yr=Math.min(h-1,Math.max(0,y-r-1));
+    acc+=tmp[ya*w+x]-(y-r-1>=0?tmp[yr*w+x]:0); out[Math.min(h-1,Math.max(0,y))*w+x]=acc/(2*r+1); } }
+  return out; }
+const soft=blur(blur(mask,FW,FH,7),FW,FH,7);
+let fseed=1;
+function drawFlame(){
+  const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
+  const PIX=2; /* размер пикселя дизера */
+  for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
+    const px=(x/PIX)|0, py=(y/PIX)|0;
+    const i=y*FW+x, n=fbm(px*0.09,py*0.09,fseed);
+    if(soft[i] <= 0.30+(n-0.5)*0.62){ d[i*4+3]=0; continue; }
+    let v=0.22+(y/FH)*0.55+(n-0.5)*0.2;
+    const th=(B4[py%4][px%4]+0.5)/16, lv=4;
+    v=Math.round(Math.min(1,Math.max(0,v+(th-0.5)/lv))*(lv-1))/(lv-1);
+    const c=ramp(v,[[0,[12,7,24]],[.34,[108,59,255]],[.67,[255,106,26]],[1,[255,186,110]]]);
+    d[i*4]=c[0]; d[i*4+1]=c[1]; d[i*4+2]=c[2]; d[i*4+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+drawFlame(); setInterval(()=>{ fseed=(fseed%50)+1; drawFlame(); },190);
+
+/* ── обложки треков (заглушки) ── */
+function ditherCanvas(cvs,{cell=2,levels=3,stops,field}){
+  const W=cvs.width,H=cvs.height,ctx=cvs.getContext('2d'),img=ctx.createImageData(W,H),d=img.data;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    let v=Math.min(1,Math.max(0,field(x/W,y/H)));
+    const cx=(x/cell)|0, cy=(y/cell)|0;
+    const th=(B4[cy%4][cx%4]+0.5)/16;
+    v=Math.round(Math.min(1,Math.max(0,v+(th-0.5)/levels))*(levels-1))/(levels-1);
+    const c=ramp(v,stops),i=(y*W+x)*4;
+    d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+ditherCanvas(document.getElementById('t1'),{cell:3,levels:3,
+  stops:[[0,[10,6,20]],[.5,[90,50,220]],[.85,[255,106,26]],[1,[255,180,90]]],
+  field:(u,v)=>Math.min(1,Math.max(0,.95-.95*Math.hypot(u-.44,v-.42)))});
+ditherCanvas(document.getElementById('t2'),{cell:3,levels:2,
+  stops:[[0,[14,9,26]],[1,[236,231,218]]],
+  field:(u,v)=>Math.min(1,Math.max(0,.85-.8*Math.abs(v-.46)*1.5-.35*Math.abs(u-.5)))});
+ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
+  stops:[[0,[8,5,18]],[.55,[70,32,150]],[1,[255,140,60]]],
+  field:(u,v)=>Math.min(1,Math.max(0,.9-.75*Math.hypot(u-.32,v-.68)+.22*Math.sin(u*9)))});
+
+/* ── рваная кромка стыка: одинаковый профиль на обеих половинах ── */
+(function(){
+  const L=document.querySelector('.paperPanel'), R=document.querySelector('.bgPanel');
+  const W=720,H=1000,step=9,amp=13;
+  const h=i=>{ let n=i*374761393+668265263; n=(n^(n>>13))*1274126177; return ((n^(n>>16))>>>0)/4294967295; };
+  const vn=i=>{ const a=h(Math.floor(i)),b=h(Math.floor(i)+1),f=i-Math.floor(i),u=f*f*(3-2*f); return a*(1-u)+b*u; };
+  const pts=[];
+  for(let y=0;y<=H;y+=step){ const t=y/step; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
+  R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),`${W}px 100%`,`${W}px 0`].join(',')})`;
+  L.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${(W+x).toFixed(1)}px ${y}px`),'0 100%'].join(',')})`;
+})();
+
+/* ── фон правой половины: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
+(function(){
+  const cvs=document.getElementById('bg');
+  cvs.width=720; cvs.height=1000;
+  const gl=cvs.getContext('webgl',{antialias:false,alpha:false});
+  if(!gl) return;
+  const vs=`attribute vec4 a_position; void main(){ gl_Position=a_position; }`;
+  const fs=`
+    precision highp float;
+    uniform float time, spin_time, contrast, spin_amount, pixel_fac, spin_ease, zoom;
+    uniform vec2 offset, resolution;
+    uniform vec4 colour_1, colour_2, colour_3;
+    void main(){
+      vec2 sc=gl_FragCoord.xy;
+      float pixel_size=length(resolution.xy)/pixel_fac;
+      vec2 uv=(floor(sc.xy/pixel_size)*pixel_size-0.5*resolution.xy)/length(resolution.xy)-offset;
+      float uv_len=length(uv);
+      float speed=(spin_time*spin_ease*0.2)+302.2;
+      float angle=atan(uv.y,uv.x)+(spin_amount>0.0 ? speed-spin_ease*20.0*(spin_amount*uv_len+(1.0-spin_amount)) : 0.0);
+      vec2 mid=(resolution.xy/length(resolution.xy))/2.0;
+      uv=vec2(uv_len*cos(angle)+mid.x, uv_len*sin(angle)+mid.y)-mid;
+      uv*=zoom;
+      speed=time*2.0;
+      vec2 uv2=vec2(uv.x+uv.y);
+      for(int i=0;i<5;i++){
+        uv2+=sin(max(uv.x,uv.y))+uv;
+        uv+=0.5*vec2(cos(5.1123314+0.353*uv2.y+speed*0.131121), sin(uv2.x-0.113*speed));
+        uv-=1.0*cos(uv.x+uv.y)-1.0*sin(uv.x*0.711-uv.y);
+      }
+      float cmod=(0.25*contrast+0.5*spin_amount+1.2);
+      float paint=min(2.0,max(0.0,length(uv)*0.035*cmod));
+      float c1p=max(0.0,1.0-cmod*abs(1.0-paint));
+      float c2p=max(0.0,1.0-cmod*abs(paint));
+      float c3p=1.0-min(1.0,c1p+c2p);
+      vec4 ret=(0.3/contrast)*colour_1+(1.0-0.3/contrast)*(colour_1*c1p+colour_2*c2p+vec4(c3p*colour_3.rgb,c3p*colour_1.a));
+      gl_FragColor=ret;
+    }`;
+  function sh(t,src){ const s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s); return s; }
+  const p=gl.createProgram();
+  gl.attachShader(p,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(p); gl.useProgram(p);
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(p,'a_position'); gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const u=n=>gl.getUniformLocation(p,n);
+  const U={time:u('time'),spin:u('spin_time'),contrast:u('contrast'),spinAmount:u('spin_amount'),
+    pixelFac:u('pixel_fac'),spinEase:u('spin_ease'),zoom:u('zoom'),offset:u('offset'),res:u('resolution'),
+    c1:u('colour_1'),c2:u('colour_2'),c3:u('colour_3')};
+  const hex=h=>{ h=h.replace('#',''); const n=parseInt(h,16); return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255]; };
+  const C1=hex('#0A0520'), C2=hex('#3A1C9E'), C3=hex('#8A5BFF');
+  let last=0;
+  function frame(t){
+    if(t-last>1000/30){
+      last=t;
+      gl.viewport(0,0,cvs.width,cvs.height);
+      gl.uniform1f(U.time,t*0.001*0.55); gl.uniform1f(U.spin,t*0.001*0.55);
+      gl.uniform1f(U.contrast,1.05); gl.uniform1f(U.spinAmount,0.34);
+      gl.uniform1f(U.pixelFac,430); gl.uniform1f(U.spinEase,0.1); gl.uniform1f(U.zoom,22);
+      gl.uniform2f(U.offset,0,0); gl.uniform2f(U.res,cvs.width,cvs.height);
+      gl.uniform4f(U.c1,...C1,1); gl.uniform4f(U.c2,...C2,1); gl.uniform4f(U.c3,...C3,1);
+      gl.drawArrays(gl.TRIANGLES,0,6);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ── подзаголовок: буквы с разбросом, обводка вырезает имя ── */
+(async()=>{
+  await document.fonts.ready;
+  const NS='http://www.w3.org/2000/svg';
+  const TAG='дизайн, монтаж, миры';
+  const tg=document.getElementById('tagLetters');
+  const mg=document.getElementById('maskLetters');
+  const cx=document.createElement('canvas').getContext('2d');
+  cx.font='44px Chaos16';
+
+  let x=0;
+  const pairs=[];
+  for(const ch of TAG){
+    const mk=(g)=>{
+      const t=document.createElementNS(NS,'text');
+      t.setAttribute('x',x.toFixed(2));
+      t.setAttribute('y','232');
+      t.setAttribute('xml:space','preserve');
+      t.textContent=ch;
+      t.style.transformBox='fill-box';
+      t.style.transformOrigin='50% 50%';
+      t.style.transition='transform .4s cubic-bezier(.2,1.4,.4,1)';
+      g.appendChild(t);
+      return t;
+    };
+    pairs.push([mk(tg),mk(mg)]);
+    x += cx.measureText(ch).width;
+  }
+
+  const jitter=()=>{
+    for(const [a,b] of pairs){
+      const rot=((Math.random()-.5)*7).toFixed(2);
+      const dy=((Math.random()-.5)*3).toFixed(2);
+      const s=`rotate(${rot}deg) translateY(${dy}px)`;
+      a.style.transform=s; b.style.transform=s;
+    }
+  };
+  jitter();
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(jitter,1000);
+})();
+</script>
+
+<script>
+/* ── чёрно-белый куб: пока курсор далеко — разлетается на куски ── */
+(function(){
+  const cv=document.getElementById('cube'); if(!cv) return;
+  const A=1200, ctx=cv.getContext('2d'); cv.width=A; cv.height=A;
+  const S=72;
+
+  const zbuf=new Float32Array(A*A), cbuf=new Float32Array(A*A);
+  const src=document.createElement('canvas'); src.width=src.height=A;
+  const sctx=src.getContext('2d');
+  const img=sctx.createImageData(A,A);
+
+  const BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const WHITE=[242,238,228], BLACK=[10,7,20];
+  const V=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+  const F=[{v:[4,5,6,7],n:[0,0,1]},{v:[0,3,2,1],n:[0,0,-1]},{v:[5,1,2,6],n:[1,0,0]},
+           {v:[0,4,7,3],n:[-1,0,0]},{v:[7,6,2,3],n:[0,1,0]},{v:[0,1,5,4],n:[0,-1,0]}];
+  const L=[-0.55,-0.42,0.72], lm=Math.hypot(...L), lx=L[0]/lm,ly=L[1]/lm,lz=L[2]/lm;
+  let amb=0.30;
+  const shade=d=>Math.min(1,0.22+1.05*Math.max(0,(0.5+0.5*d-amb)));
+
+  /* объёмная фрактура: семена внутри куба → выпуклые ячейки Вороного */
+  let sd=11; const rnd=()=>{ sd=(sd*1103515245+12345)&0x7fffffff; return sd/0x7fffffff; };
+  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+  const dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const nrm3=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];};
+  const CUBE=[{n:[1,0,0],d:1},{n:[-1,0,0],d:1},{n:[0,1,0],d:1},{n:[0,-1,0],d:1},{n:[0,0,1],d:1},{n:[0,0,-1],d:1}];
+
+  const seeds=[];
+  for(let t=0;t<1200&&seeds.length<18;t++){
+    const p=[(rnd()*2-1)*0.84,(rnd()*2-1)*0.84,(rnd()*2-1)*0.84];
+    if(seeds.every(s=>Math.hypot(p[0]-s[0],p[1]-s[1],p[2]-s[2])>0.62)) seeds.push(p);
+  }
+
+  function buildCell(i){
+    const pi=seeds[i], planes=CUBE.slice();
+    seeds.forEach((pj,j)=>{ if(j===i) return;
+      planes.push({n:nrm3(sub(pj,pi)), d:(dot3(pj,pj)-dot3(pi,pi))/2, inn:true});
+    });
+    /* вершины: пересечения всех троек плоскостей, лежащие внутри всех полупространств */
+    const vs=[];
+    for(let a=0;a<planes.length;a++)for(let b=a+1;b<planes.length;b++)for(let c=b+1;c<planes.length;c++){
+      const n1=planes[a].n,n2=planes[b].n,n3=planes[c].n,d1=planes[a].d,d2=planes[b].d,d3=planes[c].d;
+      const det=n1[0]*(n2[1]*n3[2]-n2[2]*n3[1])-n1[1]*(n2[0]*n3[2]-n2[2]*n3[0])+n1[2]*(n2[0]*n3[1]-n2[1]*n3[0]);
+      if(Math.abs(det)<1e-7) continue;
+      const v=[
+        (d1*(n2[1]*n3[2]-n2[2]*n3[1])-n1[1]*(d2*n3[2]-n2[2]*d3)+n1[2]*(d2*n3[1]-n2[1]*d3))/det,
+        (n1[0]*(d2*n3[2]-n2[2]*d3)-d1*(n2[0]*n3[2]-n2[2]*n3[0])+n1[2]*(n2[0]*d3-d2*n3[0]))/det,
+        (n1[0]*(n2[1]*d3-d2*n3[1])-n1[1]*(n2[0]*d3-d2*n3[0])+d1*(n2[0]*n3[1]-n2[1]*n3[0]))/det
+      ];
+      if(planes.some(p=>p.n[0]*v[0]+p.n[1]*v[1]+p.n[2]*v[2]>p.d+1e-6)) continue;
+      if(vs.some(o=>Math.abs(o[0]-v[0])<1e-5&&Math.abs(o[1]-v[1])<1e-5&&Math.abs(o[2]-v[2])<1e-5)) continue;
+      vs.push(v);
+    }
+    if(vs.length<4) return null;
+    /* грани: точки на каждой плоскости, отсортированные по углу вокруг нормали */
+    const faces=[];
+    planes.forEach(p=>{
+      const on=vs.filter(v=>Math.abs(p.n[0]*v[0]+p.n[1]*v[1]+p.n[2]*v[2]-p.d)<1e-5);
+      if(on.length<3) return;
+      const c0=[0,0,0]; on.forEach(v=>{c0[0]+=v[0];c0[1]+=v[1];c0[2]+=v[2];});
+      c0[0]/=on.length;c0[1]/=on.length;c0[2]/=on.length;
+      const u=nrm3(cross(p.n,Math.abs(p.n[0])>0.7?[0.1,0.8,0.4]:[0.9,0.2,0.4])), w=cross(p.n,u);
+      on.sort((a,b)=>{
+        const A=sub(a,c0),B=sub(b,c0);
+        return Math.atan2(dot3(A,w),dot3(A,u))-Math.atan2(dot3(B,w),dot3(B,u));
+      });
+      faces.push({poly:on,n:p.n,inn:!!p.inn});
+    });
+    const ctr=[0,0,0]; vs.forEach(v=>{ctr[0]+=v[0];ctr[1]+=v[1];ctr[2]+=v[2];});
+    ctr[0]/=vs.length;ctr[1]/=vs.length;ctr[2]/=vs.length;
+    /* золотой угол — соседние куски летят в разные стороны, без перекоса по осям */
+    const ga=2.39996323*(i+1)+rnd()*0.3;
+    const dx=Math.cos(ga), dy=Math.sin(ga);
+    return {faces,ctr,dir:[dx,dy,0],
+            spin:(rnd()-0.5)*0.7, r:(i*0.6180339887)%1,
+            tint:0.86+rnd()*0.3, k:0.55+rnd()*0.9, axis:nrm3([rnd()-0.5,rnd()-0.5,rnd()-0.5])};
+  }
+  const cells=seeds.map((_,i)=>buildCell(i)).filter(c=>c&&c.faces.length>3);
+
+  /* проекция и повороты */
+  const rotCube=(p,rx,ry)=>{
+    const X=p[0]*Math.cos(ry)+p[2]*Math.sin(ry);
+    const Z1=-p[0]*Math.sin(ry)+p[2]*Math.cos(ry);
+    const Y=p[1]*Math.cos(rx)-Z1*Math.sin(rx);
+    const Z=p[1]*Math.sin(rx)+Z1*Math.cos(rx);
+    return [X,Y,Z];
+  };
+  const rotAxis=(v,ax,ang)=>{
+    const c=Math.cos(ang), s=Math.sin(ang), d=dot3(ax,v), cr=cross(ax,v);
+    return [v[0]*c+cr[0]*s+ax[0]*d*(1-c),
+            v[1]*c+cr[1]*s+ax[1]*d*(1-c),
+            v[2]*c+cr[2]*s+ax[2]*d*(1-c)];
+  };
+  const proj=p=>{ const k=Math.max(0.45,Math.min(1.55,1/(1-p[2]*0.26))); return [A/2+p[0]*S*k, A/2+p[1]*S*k]; };
+
+  let mx=window.innerWidth*0.06, my=window.innerHeight*0.92, hasPointer=false;
+  window.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; hasPointer=true; },{passive:true});
+
+  let spread=1, tiltX=0, tiltY=0;
+  const t0=performance.now();
+
+  function frame(now){
+    const r=cv.getBoundingClientRect();
+    const cxp=r.left+r.width/2, cyp=r.top+r.height/2;
+    const dx=mx-cxp, dy=my-cyp, dist=Math.hypot(dx,dy);
+    const t=Math.min(1,Math.max(0,(dist-150)/430));
+    spread += ((hasPointer?t:1)-spread)*0.09;
+    tiltY += ((dx/560)-tiltY)*0.08;
+    tiltX += ((dy/700)-tiltX)*0.08;
+
+    const ry=0.62+tiltY*(1-spread)*0.75, rx=-0.34+tiltX*(1-spread)*0.75;
+    amb=0.30-0.12*spread;
+
+    /* все грани всех кусков: поворот в мире, смещение разлёта — уже в пикселях */
+    const list=[];
+    for(const c of cells){
+      const sp=spread;
+      const off=(0.9+5.4*c.r)*sp*S;
+      const ox=c.dir[0]*off, oy=c.dir[1]*off;
+      for(const f of c.faces){
+        const pts=[], dp=[]; let zs=0, ctr3=[0,0,0];
+        f.poly.forEach(v=>{
+          const q=rotAxis(sub(v,c.ctr),c.axis,c.spin*sp*0.45);
+          const w=rotCube([q[0]+c.ctr[0], q[1]+c.ctr[1], q[2]+c.ctr[2]],rx,ry);
+          ctr3[0]+=w[0];ctr3[1]+=w[1];ctr3[2]+=w[2]; zs+=w[2];
+          const p=proj(w);
+          pts.push([p[0]+ox, p[1]+oy]); dp.push(-w[2]);
+        });
+        ctr3=ctr3.map(v=>v/f.poly.length);
+        let nv=rotAxis(f.n,c.axis,c.spin*sp*0.45);
+        nv=rotCube(nv,rx,ry);
+        const nl=Math.hypot(nv[0],nv[1],nv[2])||1;
+        nv=[nv[0]/nl,nv[1]/nl,nv[2]/nl];
+        /* отсечение задних граней: смотрим из камеры на центр грани */
+        if(nv[0]*(-ctr3[0])+nv[1]*(-ctr3[1])+nv[2]*(4.2-ctr3[2])<=0) continue;
+        const tone=shade(nv[0]*lx+nv[1]*ly+nv[2]*lz)*c.tint;
+        list.push({pts,dp,z:zs/f.poly.length,tone,inn:f.inn});
+      }
+    }
+    list.sort((a,b)=>a.z-b.z);
+
+    /* ── растеризация с z-буфером ── */
+    zbuf.fill(1e9); cbuf.fill(-1);
+
+    function raster(pts, dp, tone){
+      let minY=1e9, maxY=-1e9;
+      for(const p of pts){ if(p[1]<minY)minY=p[1]; if(p[1]>maxY)maxY=p[1]; }
+      const y0=Math.max(0,Math.ceil(minY-0.5)), y1=Math.min(A-1,Math.floor(maxY-0.5));
+      for(let y=y0;y<=y1;y++){
+        const yc=y+0.5, xs=[];
+        for(let i=0;i<pts.length;i++){
+          const a=pts[i], b=pts[(i+1)%pts.length];
+          if((a[1]<=yc&&b[1]>yc)||(b[1]<=yc&&a[1]>yc)){
+            const k=(yc-a[1])/(b[1]-a[1]);
+            xs.push([a[0]+(b[0]-a[0])*k, dp[i]+(dp[(i+1)%pts.length]-dp[i])*k]);
+          }
+        }
+        xs.sort((a,b)=>a[0]-b[0]);
+        for(let i=0;i+1<xs.length;i+=2){
+          const xa=xs[i], xb=xs[i+1], span=xb[0]-xa[0];
+          if(span<=0) continue;
+          const x0=Math.max(0,Math.ceil(xa[0]-0.5)), x1=Math.min(A-1,Math.floor(xb[0]-0.5));
+          for(let x=x0;x<=x1;x++){
+            const k=(x+0.5-xa[0])/span, z=xa[1]+(xb[1]-xa[1])*k, j=y*A+x;
+            if(z<zbuf[j]){ zbuf[j]=z; cbuf[j]=tone; }
+          }
+        }
+      }
+    }
+
+    /* чёрная обводка граней — держит форму и прячет щели между кусками */
+    const edgeA=Math.max(0,Math.min(1,(spread-0.12)*3));
+    function edge(pts, dp, th, force){
+      if(!force && edgeA<0.02) return;
+      th=th||1;
+      for(let i=0;i<pts.length;i++){
+        const a=pts[i], b=pts[(i+1)%pts.length], za=dp[i]-0.02, zb=dp[(i+1)%pts.length]-0.02;
+        const L=Math.hypot(b[0]-a[0],b[1]-a[1]); if(L<0.5) continue;
+        const n=Math.ceil(L);
+        for(let s=0;s<=n;s++){
+          const k=s/n, x=Math.round(a[0]+(b[0]-a[0])*k), y=Math.round(a[1]+(b[1]-a[1])*k);
+          const z=za+(zb-za)*k;
+          for(let oy=0;oy<th;oy++)for(let ox=0;ox<th;ox++){
+            const xx=x+ox, yy=y+oy;
+            if(xx<0||yy<0||xx>=A||yy>=A) continue;
+            const j=yy*A+xx;
+            if(z<zbuf[j]){ zbuf[j]=z; cbuf[j]=0; }
+          }
+        }
+      }
+    }
+
+    const Q8=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+
+    /* вершины грани, выбранные фильтром, идут в порядке массива, а не по кругу —
+       без сортировки по углу полигон получается «бабочкой» и рисует крест */
+    function sortPoly(pts,dp){
+      const cx=pts.reduce((s,p)=>s+p[0],0)/pts.length, cy=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+      const idx=pts.map((p,i)=>i).sort((a,b)=>Math.atan2(pts[a][1]-cy,pts[a][0]-cx)-Math.atan2(pts[b][1]-cy,pts[b][0]-cx));
+      const p2=idx.map(i=>pts[i]), d2=idx.map(i=>dp[i]);
+      pts.length=0; pts.push(...p2);
+      dp.length=0; dp.push(...d2);
+    }
+
+    /* силуэт больше не нужен: при сборке куб закрыт своими гранями */
+
+    /* подложка: пока куб собран — цельные грани, без швов между кусками */
+    if(spread<0.14){
+      const basePolys=[];
+      for(const p of CUBE){
+        const on=Q8.filter(v=>Math.abs(dot3(p.n,v)-p.d)<1e-6);
+        const nv=rotCube(p.n,rx,ry);
+        if(nv[2]<=0) continue;
+        const pts=[], dp=[];
+        for(const v of on){ const w=rotCube(v,rx,ry); pts.push(proj(w)); dp.push(-w[2]-0.3); }
+        sortPoly(pts, dp);
+        const tone=Math.min(0.88,shade(nv[0]*lx+nv[1]*ly+nv[2]*lz));
+        raster(pts, dp, tone);
+        basePolys.push([pts,dp]);
+      }
+      /* обводка отдельным проходом — иначе грани затирают её своей заливкой */
+      for(const [pts,dp] of basePolys) edge(pts, dp, 2, true);
+    }
+
+    /* куски */
+    for(const g of list){
+      if(g.inn && spread<0.14) continue;
+      raster(g.pts, g.dp, g.inn ? g.tone*(0.55+0.32*spread) : g.tone);
+      edge(g.pts, g.dp);
+    }
+
+    /* двухцветный дизер, пиксель PX×PX */
+    const PX=4, d=img.data;
+    for(let y=0;y<A;y+=PX)for(let x=0;x<A;x+=PX){
+      const th=(BAYER[((y/PX)|0)&3][((x/PX)|0)&3]+0.5)/16;
+      const t=cbuf[y*A+x];
+      let c;
+      if(t<0) c=[0,0,0,0];
+      else c = t > th ? [...WHITE,255] : [...BLACK,255];
+      const ye=Math.min(y+PX,A), xe=Math.min(x+PX,A);
+      for(let yy=y;yy<ye;yy++)for(let xx=x;xx<xe;xx++){
+        const j=(yy*A+xx)*4;
+        d[j]=c[0]; d[j+1]=c[1]; d[j+2]=c[2]; d[j+3]=c[3];
+      }
+    }
+    sctx.putImageData(img,0,0);
+
+    /* куски */
+    ctx.clearRect(0,0,A,A);
+    ctx.drawImage(src,0,0);
+  }
+  frame(performance.now());
+  setInterval(()=>frame(performance.now()), 33);
+})();
+
+/* ── обложки видео: заглушки под будущие превью с канала ── */
+(function(){
+  const stopsA=[[0,[9,5,22]],[.42,[92,52,230]],[.78,[255,106,26]],[1,[255,206,150]]];
+  const stopsB=[[0,[12,8,24]],[1,[236,231,218]]];
+  const stopsC=[[0,[10,6,20]],[.55,[70,32,150]],[1,[255,140,60]]];
+  const specs=[
+    ['v1',stopsA,(u,v)=>Math.min(1,Math.max(0,.98-.98*Math.hypot(u-.42,v-.48)))],
+    ['v2',stopsB,(u,v)=>Math.min(1,Math.max(0,.72-.55*Math.abs(v-.5)+.22*Math.sin(u*17)))],
+    ['v3',stopsC,(u,v)=>Math.min(1,Math.max(0,.15+.85*(u*.62+v*.38)))],
+    ['v4',stopsA,(u,v)=>Math.min(1,Math.max(0,.55+.55*Math.sin(Math.hypot(u-.5,v-.5)*23-.8)))],
+    ['v5',stopsC,(u,v)=>Math.min(1,Math.max(0,.9-.9*Math.abs(v-.42)*1.9+.18*Math.sin(u*9+1)))],
+    ['v6',stopsB,(u,v)=>Math.min(1,Math.max(0,.85-.85*Math.hypot(u-.62,v-.62)*1.5))]
+  ];
+  specs.forEach(([id,stops,field])=>{
+    const c=document.getElementById(id);
+    if(c) ditherCanvas(c,{cell:3,levels:3,stops,field});
+  });
+})();
+
+/* ── карточки: наклон за курсором + фольга ── */
+(function(){
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced) return;
+  document.querySelectorAll('.vcard,.track').forEach(el=>{
+    el.addEventListener('mouseenter',()=>el.style.setProperty('--tz','-6px'));
+    el.addEventListener('mousemove',e=>{
+      const r=el.getBoundingClientRect();
+      const nx=(e.clientX-r.left)/r.width-.5;
+      const ny=(e.clientY-r.top)/r.height-.5;
+      el.style.setProperty('--ry',(nx*13).toFixed(2)+'deg');
+      el.style.setProperty('--rx',(-ny*13).toFixed(2)+'deg');
+      el.style.setProperty('--fx',(50+nx*70).toFixed(1)+'%');
+      el.style.setProperty('--fy',(50+ny*70).toFixed(1)+'%');
+    });
+    el.addEventListener('mouseleave',()=>{
+      el.style.setProperty('--ry','0deg');
+      el.style.setProperty('--rx','0deg');
+      el.style.setProperty('--tz','0px');
+    });
+  });
+})();
+
+/* ── рваная верхняя кромка подвала ── */
+(function(){
+  const f=document.querySelector('.foot'); if(!f) return;
+  const W=1440, H=f.offsetHeight+40, step=9, amp=11, pts=[];
+  for(let x=0;x<=W;x+=step){
+    const n=vnoise(x*0.045,7.3,91)*2-1;
+    pts.push(x+'px '+Math.round(9+n*amp)+'px');
+  }
+  f.style.clipPath='polygon('+pts.join(',')+', '+W+'px '+H+'px, 0px '+H+'px)';
+})();
+</script>
+</body>
+</html>
