@@ -65,6 +65,12 @@ def iso_seconds(s):
     return h * 3600 + mnt * 60 + sec
 
 
+def fmt_dur(secs):
+    m, s = divmod(int(secs), 60)
+    h, m = divmod(m, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
 def fetch_seconds(vid):
     """Length of a video in seconds, or None if undetectable.
 
@@ -127,13 +133,13 @@ def main():
             continue  # shorts — or undetectable (fail-closed, never keep)
         videos.append((vid, html.unescape(title),
                        datetime.datetime.fromisoformat(
-                           pub.replace("Z", "+00:00")).date()))
+                           pub.replace("Z", "+00:00")).date(), secs))
     if len(videos) < COUNT:
         raise SystemExit(f"only {len(videos)} long videos in feed, aborting")
 
     today = datetime.date.today()
     os.makedirs(THUMBS, exist_ok=True)
-    for vid, _, _ in videos:
+    for vid, _, _, _ in videos:
         dest = os.path.join(THUMBS, f"{vid}.jpg")
         if not os.path.exists(dest):
             req = urllib.request.Request(
@@ -142,17 +148,18 @@ def main():
                     open(dest, "wb") as f:
                 f.write(r.read())
     # prune thumbs of videos that fell out of the list
-    keep = {f"{vid}.jpg" for vid, _, _ in videos}
+    keep = {f"{vid}.jpg" for vid, _, _, _ in videos}
     for name in os.listdir(THUMBS):
         if name.endswith(".jpg") and name not in keep:
             os.remove(os.path.join(THUMBS, name))
 
     cards = []
-    for i, (vid, title, pub) in enumerate(videos, 1):
+    for i, (vid, title, pub, secs) in enumerate(videos, 1):
         cards.append(
             f'    <a class="vcard" href="https://www.youtube.com/watch?v={vid}">\n'
             f'      <div class="shot"><canvas id="v{i}" width="384" height="216">'
-            f"</canvas><div class=\"foil\"></div></div>\n"
+            f"</canvas><div class=\"foil\"></div>"
+            f"<span class=\"vdur\">{fmt_dur(secs)}</span></div>\n"
             f"      <h3>{html.escape(title, quote=False)}</h3>\n"
             f'      <div class="vmeta"><span>{rel_date(pub, today)}</span></div>\n'
             f"    </a>"
