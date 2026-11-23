@@ -1,0 +1,27 @@
+name: update-videos
+
+on:
+  schedule:
+    - cron: "0 5 * * *"  # daily 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh latest videos
+        run: python3 .github/scripts/update_videos.py
+      - name: Commit and push if changed
+        run: |
+          git config user.name "videos-bot"
+          git config user.email "videos-bot@users.noreply.github.com"
+          git add docs/index.html docs/assets/thumbs
+          git diff --cached --quiet || git commit -m "videos: refresh latest 6 from channel RSS"
+          git push
