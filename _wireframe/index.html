@@ -490,7 +490,8 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       const B=document.querySelector('.burn');
       if(B){
         const bp=pts.map(([y,x])=>`${(x+10-3-7*vn(y/step*2.3+5)).toFixed(1)}px ${y}px`);
-        B.style.clipPath=`polygon(${[...bp,`${W+10}px 100%`,`${W+10}px 0`].join(',')})`;
+        const seam=pts.map(([y,x])=>`${(x+10).toFixed(1)}px ${y}px`).reverse();
+        B.style.clipPath=`polygon(${[...bp,...seam].join(',')})`;
         B.style.opacity='1';
       }
     }
