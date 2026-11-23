@@ -688,8 +688,6 @@ function balatro(cvs){
     uniform vec2 offset, resolution;
     uniform vec4 colour_1, colour_2, colour_3;
     uniform vec4 colour_4;
-    float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
-    #define bayer4(a) (bayer2(.5*(a))*.25+bayer2(a))
     void main(){
       vec2 sc=gl_FragCoord.xy;
       float pixel_size=length(resolution.xy)/pixel_fac;
@@ -715,7 +713,6 @@ function balatro(cvs){
       float c4p=smoothstep(0.45,0.9,c3p);
       c3p*=(1.0-c4p);
       vec4 ret=(0.3/contrast)*colour_1+(1.0-0.3/contrast)*(colour_1*c1p+colour_2*c2p+vec4(c3p*colour_3.rgb,c3p*colour_1.a)+vec4(c4p*colour_4.rgb,c4p*colour_1.a));
-      ret.rgb=floor(ret.rgb*4.0+bayer4(gl_FragCoord.xy/3.0))/4.0;
       gl_FragColor=ret;
     }`;
   function sh(t,src){ const s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s); return s; }
