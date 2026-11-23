@@ -519,6 +519,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
     uniform float time, spin_time, contrast, spin_amount, pixel_fac, spin_ease, zoom;
     uniform vec2 offset, resolution;
     uniform vec4 colour_1, colour_2, colour_3;
+    uniform vec4 colour_4;
     float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
     #define bayer4(a) (bayer2(.5*(a))*.25+bayer2(a))
     void main(){
@@ -543,7 +544,9 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       float c1p=max(0.0,1.0-cmod*abs(1.0-paint));
       float c2p=max(0.0,1.0-cmod*abs(paint));
       float c3p=1.0-min(1.0,c1p+c2p);
-      vec4 ret=(0.3/contrast)*colour_1+(1.0-0.3/contrast)*(colour_1*c1p+colour_2*c2p+vec4(c3p*colour_3.rgb,c3p*colour_1.a));
+      float c4p=smoothstep(0.55,0.95,c3p);
+      c3p*=(1.0-c4p);
+      vec4 ret=(0.3/contrast)*colour_1+(1.0-0.3/contrast)*(colour_1*c1p+colour_2*c2p+vec4(c3p*colour_3.rgb,c3p*colour_1.a)+vec4(c4p*colour_4.rgb,c4p*colour_1.a));
       ret.rgb=floor(ret.rgb*4.0+bayer4(gl_FragCoord.xy/3.0))/4.0;
       gl_FragColor=ret;
     }`;
@@ -558,9 +561,9 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   const u=n=>gl.getUniformLocation(p,n);
   const U={time:u('time'),spin:u('spin_time'),contrast:u('contrast'),spinAmount:u('spin_amount'),
     pixelFac:u('pixel_fac'),spinEase:u('spin_ease'),zoom:u('zoom'),offset:u('offset'),res:u('resolution'),
-    c1:u('colour_1'),c2:u('colour_2'),c3:u('colour_3')};
+    c1:u('colour_1'),c2:u('colour_2'),c3:u('colour_3'),c4:u('colour_4')};
   const hex=h=>{ h=h.replace('#',''); const n=parseInt(h,16); return [((n>>16)&255)/255,((n>>8)&255)/255,(n&255)/255]; };
-  const C1=hex('#070313'), C2=hex('#4A1FD6'), C3=hex('#A86BFF');
+  const C1=hex('#070313'), C2=hex('#4A1FD6'), C3=hex('#A86BFF'), C4=hex('#FF6A1A');
   let last=0;
   function frame(t){
     if(t-last>1000/30){
@@ -570,7 +573,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       gl.uniform1f(U.contrast,1.4); gl.uniform1f(U.spinAmount,0.45);
       gl.uniform1f(U.pixelFac,430); gl.uniform1f(U.spinEase,0.1); gl.uniform1f(U.zoom,22);
       gl.uniform2f(U.offset,0,0); gl.uniform2f(U.res,cvs.width,cvs.height);
-      gl.uniform4f(U.c1,...C1,1); gl.uniform4f(U.c2,...C2,1); gl.uniform4f(U.c3,...C3,1);
+      gl.uniform4f(U.c1,...C1,1); gl.uniform4f(U.c2,...C2,1); gl.uniform4f(U.c3,...C3,1); gl.uniform4f(U.c4,...C4,1);
       gl.drawArrays(gl.TRIANGLES,0,6);
     }
     requestAnimationFrame(frame);
