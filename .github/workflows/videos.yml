@@ -1,8 +1,9 @@
 name: update-videos
 
 on:
-  schedule:
-    - cron: "0 5 * * *"  # daily 05:00 UTC
+  # Schedule is OFF until a YOUTUBE_API_KEY repo secret is added:
+  # page scraping is blocked from GitHub runners, so scheduled runs
+  # would fail daily. Re-add `- cron: "0 5 * * *"` once the key exists.
   workflow_dispatch:
 
 permissions:
@@ -17,6 +18,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Refresh latest videos
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python3 .github/scripts/update_videos.py
       - name: Commit and push if changed
         run: |

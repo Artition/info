@@ -14,6 +14,12 @@ import urllib.request
 
 CHANNEL_ID = "UC9GCAvy2MyxhYoMB2L3Tb4A"
 COUNT = 6
+# Optional: a YouTube Data API v3 key (repo secret YOUTUBE_API_KEY).
+# Page scraping of watch/embed pages works from home IPs but is blocked
+# from GitHub runners (no lengthSeconds served) — so on CI the key is
+# the only way to detect shorts. Without it the script aborts loudly
+# instead of silently restoring shorts (fail-closed).
+API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../.github/scripts
 ROOT = os.path.dirname(os.path.dirname(HERE))       # repo root (.../.github -> ...)
 PAGE = os.path.join(ROOT, "docs", "index.html")
@@ -50,6 +56,15 @@ def rel_date(pub, today):
     return f"{y} {plural(y, ['год', 'года', 'лет'])} назад"
 
 
+def iso_seconds(s):
+    """Parse an ISO-8601 duration (PT2M5S) into seconds."""
+    m = re.match(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$", s or "")
+    if not m:
+        return None
+    h, mnt, sec = (int(x) if x else 0 for x in m.groups())
+    return h * 3600 + mnt * 60 + sec
+
+
 def fetch_seconds(vid):
     """Length of a video in seconds, or None if undetectable.
 
@@ -82,11 +97,31 @@ def main():
         re.S,
     )
     videos = []
+    api_cache = {}
+    if API_KEY:
+        # One batched call for the whole feed (id= supports up to 50).
+        ids = [vid for vid, _, _ in entries[:50]]
+        try:
+            req = urllib.request.Request(
+                "https://www.googleapis.com/youtube/v3/videos"
+                f"?part=contentDetails&id={','.join(ids)}&key={API_KEY}",
+                headers=UA)
+            data = urllib.request.urlopen(
+                req, timeout=30).read().decode("utf-8")
+            for item in re.findall(
+                    r'"id"\s*:\s*"([^"]+)"(.*?)"duration"\s*:\s*"([^"]+)"',
+                    data):
+                api_cache[item[0]] = iso_seconds(item[2])
+        except Exception as e:
+            print(f"api error: {e}")
     for vid, title, pub in entries:
         if len(videos) >= COUNT:
             break
-        secs = fetch_seconds(vid)
-        print(f"{vid}: {secs if secs is not None else 'unknown'}s")
+        secs = api_cache[vid] if vid in api_cache else fetch_seconds(vid)
+        if vid in api_cache:
+            print(f"{vid}: {secs if secs is not None else 'unknown'}s (api)")
+        else:
+            print(f"{vid}: {secs if secs is not None else 'unknown'}s")
         if secs is None or secs < 60:
             continue  # shorts — or undetectable (fail-closed, never keep)
         videos.append((vid, html.unescape(title),
