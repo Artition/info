@@ -50,6 +50,19 @@ def rel_date(pub, today):
     return f"{y} {plural(y, ['год', 'года', 'лет'])} назад"
 
 
+def fetch_seconds(vid):
+    """Length of a video in seconds, or None if undetectable (fail-open)."""
+    try:
+        req = urllib.request.Request(
+            f"https://www.youtube.com/watch?v={vid}", headers=UA)
+        page = urllib.request.urlopen(req, timeout=30).read().decode(
+            "utf-8", "ignore")
+        m = re.search(r'"lengthSeconds":"(\d+)"', page)
+        return int(m.group(1)) if m else None
+    except Exception:
+        return None
+
+
 def main():
     req = urllib.request.Request(RSS, headers=UA)
     xml = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
@@ -59,13 +72,18 @@ def main():
         xml,
         re.S,
     )
-    videos = [
-        (vid, html.unescape(title),
-         datetime.datetime.fromisoformat(pub.replace("Z", "+00:00")).date())
-        for vid, title, pub in entries[:COUNT]
-    ]
+    videos = []
+    for vid, title, pub in entries:
+        if len(videos) >= COUNT:
+            break
+        secs = fetch_seconds(vid)
+        if secs is not None and secs < 60:
+            continue  # shorts out
+        videos.append((vid, html.unescape(title),
+                       datetime.datetime.fromisoformat(
+                           pub.replace("Z", "+00:00")).date()))
     if len(videos) < COUNT:
-        raise SystemExit(f"only {len(videos)} videos in feed, aborting")
+        raise SystemExit(f"only {len(videos)} long videos in feed, aborting")
 
     today = datetime.date.today()
     os.makedirs(THUMBS, exist_ok=True)
