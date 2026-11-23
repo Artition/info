@@ -893,7 +893,8 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   for(const el of document.querySelectorAll('.vcard')){
     el.draggable=false;
-    let st=null, timer=0;
+    const sec=el.closest('.paperSec')||el.parentElement;
+    let st=null, timer=0, t0=0;
     const s={x:0,y:0,vx:0,vy:0,rot:0,vrot:0,tx:0,ty:0};
 
     function paint(){
@@ -906,28 +907,33 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
       el.style.translate=''; el.style.rotate=''; el.style.scale='';
       el.style.setProperty('--rx','0deg'); el.style.setProperty('--ry','0deg');
       el.style.zIndex='';
-      clearInterval(timer); timer=0;
+      if(sec.__ovf) { sec.style.overflow=''; sec.__ovf=false; }
+      clearInterval(timer); timer=0; t0=0;
     }
     function tick(){
       if(st) return;
       /* пружина: доворот с проскальзыванием, позиция и наклон тянутся к нулю */
-      s.vrot*=0.90; s.rot+=s.vrot; s.rot+=-s.rot*0.075;
+      s.vrot*=0.90; s.rot+=s.vrot; s.rot+=-s.rot*0.06;
       s.vx*=0.86; s.vy*=0.86;
-      s.x+=s.vx*0.5-s.x*0.16; s.y+=s.vy*0.5-s.y*0.16;
-      s.tx+=-s.tx*0.16; s.ty+=-s.ty*0.16;
+      s.x+=s.vx-s.x*0.14; s.y+=s.vy-s.y*0.14;
+      s.tx+=-s.tx*0.15; s.ty+=-s.ty*0.15;
       paint();
-      if(Math.abs(s.rot)<0.2&&Math.abs(s.vrot)<0.05&&Math.abs(s.x)<0.6&&Math.abs(s.y)<0.6){
-        stop();
-      }
+      if(!t0) t0=performance.now();
+      const done = Math.abs(s.rot)<0.25 && Math.abs(s.vrot)<0.08
+        && Math.abs(s.x)<0.8 && Math.abs(s.y)<0.8
+        && Math.abs(s.tx)<0.2 && Math.abs(s.ty)<0.2;
+      if(done || performance.now()-t0>2600) stop();
     }
-    function run(){ if(!timer) timer=setInterval(tick,16); }
+    function run(){ if(!timer){ t0=0; timer=setInterval(tick,16); } }
 
     el.addEventListener('pointerdown',e=>{
       if(e.button!==0||e.pointerType==='touch') return;
       st={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
       el.__drag=st; el.__phys=true;
-      el.style.zIndex='30';
+      el.style.zIndex='40';
       el.style.scale='1.05 1.05';
+      /* карта должна выезжать за границы секции, а не обрезаться */
+      if(getComputedStyle(sec).overflow!=='visible'){ sec.style.overflow='visible'; sec.__ovf=true; }
       s.vrot=0; s.vx=0; s.vy=0;
       el.setPointerCapture(e.pointerId);
       paint();
@@ -938,15 +944,15 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
       if(!st.moved&&Math.hypot(dx,dy)>4){ st.moved=true; el.style.cursor='grabbing'; }
       if(!st.moved) return;
       st.x=e.clientX; st.y=e.clientY;
-      /* карта уезжает за рукой, но не дальше привязи */
-      s.x=Math.max(-30,Math.min(30,s.x+dx*0.5));
-      s.y=Math.max(-30,Math.min(30,s.y+dy*0.5));
-      /* горизонтальное движение крутит карту — как в руке */
-      s.rot=Math.max(-28,Math.min(28,s.rot+dx*0.55));
-      s.vrot=dx*0.55;
-      s.vy=dy*0.5; s.vx=dx*0.5;
-      s.ty=Math.max(-18,Math.min(18,s.ty+dx*0.9));
-      s.tx=Math.max(-18,Math.min(18,s.tx-dy*0.9));
+      /* карта идёт точно за рукой, без привязи */
+      s.x+=dx; s.y+=dy;
+      /* горизонтальное движение проворачивает карту — можно накрутить хоть три оборота */
+      s.rot+=dx*0.35;
+      s.vrot=dx*0.5;
+      s.vx=dx*0.9; s.vy=dy*0.9;
+      /* наклон — от смещения относительно центра, как настоящая карта в руке */
+      s.ty=Math.max(-22,Math.min(22,s.x*0.10));
+      s.tx=Math.max(-22,Math.min(22,-s.y*0.10));
       paint();
     });
     const end=()=>{
