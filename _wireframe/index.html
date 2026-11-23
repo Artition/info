@@ -50,7 +50,7 @@
   .plate .nm text{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:138px;letter-spacing:-4.8px;fill:var(--ink)}
 
   #flame{position:absolute;left:-300px;top:-10px;width:480px;height:960px;image-rendering:pixelated;z-index:1;
-    transform:rotate(-3deg) scaleX(-1)}
+    transform:rotate(-3deg) scaleX(-1);-webkit-mask:url(#flameCut);mask:url(#flameCut)}
 
   /* ── куб: чёрно-белый дизер ── */
   .cubeWrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1200px;height:1200px;z-index:1;pointer-events:none}
@@ -267,6 +267,16 @@
   </filter>
 </svg>
 
+<svg width="0" height="0" aria-hidden="true" style="position:absolute;left:0;top:0">
+  <defs>
+    <mask id="flameCut" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="480" height="960">
+      <rect x="0" y="0" width="480" height="960" fill="#fff"/>
+      <g id="flameMaskLetters" fill="#000" stroke="#000" stroke-width="8" stroke-linejoin="round"
+         font-family="Chaos16, monospace" text-anchor="middle" dominant-baseline="middle"></g>
+    </mask>
+  </defs>
+</svg>
+
 <div class="screen">
   <div class="paperPanel">
     <div class="paperbg"></div><div class="halftone"></div>
@@ -442,55 +452,12 @@ for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
   soft[y*FW+x]*=ex*ey;
 }
 let fseed=1;
-/* маска выреза: подзаголовок с обводкой, отрисованный в координатах страницы */
-function tagCutMask(){
-  const plate=document.querySelector('.plate');
-  const ts=[...document.querySelectorAll('#tagLetters text')];
-  if(!plate||!ts.length) return null;
-  const pw=plate.getBoundingClientRect().width; if(!pw) return null;
-  const scale=pw/520, fs=44*scale, sw=20*scale;
-  const items=[];
-  for(const t of ts){
-    const ch=t.textContent, r=t.getBoundingClientRect();
-    if(!ch.trim()||(!r.width&&!r.height)) continue;
-    items.push({ch,r});
-  }
-  if(!items.length) return null;
-  const x0=Math.min(...items.map(i=>i.r.left))-sw, y0=Math.min(...items.map(i=>i.r.top))-sw;
-  const x1=Math.max(...items.map(i=>i.r.right))+sw, y1=Math.max(...items.map(i=>i.r.bottom))+sw;
-  const w=Math.ceil(x1-x0), h=Math.ceil(y1-y0);
-  const c=document.createElement('canvas'); c.width=w; c.height=h;
-  const g=c.getContext('2d');
-  g.font=`${fs}px Chaos16`; g.textAlign='center'; g.textBaseline='middle';
-  g.fillStyle='#000'; g.strokeStyle='#000'; g.lineWidth=sw; g.lineJoin='round';
-  for(const {ch,r} of items){
-    const xm=r.left+r.width/2-x0, ym=r.top+r.height/2-y0;
-    g.strokeText(ch,xm,ym); g.fillText(ch,xm,ym);
-  }
-  return {a:g.getImageData(0,0,w,h).data,w,h,x0,y0};
-}
 function drawFlame(){
   const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
-  /* вырез в пламени по контуру букв подзаголовка (с обводкой, как в маске cutTag) */
-  const fr=fc.getBoundingClientRect(), cut=fr.width?tagCutMask():null;
-  let cx0=fr.left+fr.width/2, cy0=fr.top+fr.height/2, mx=null, ew=fc.offsetWidth, eh=fc.offsetHeight;
-  if(cut){
-    const tf=getComputedStyle(fc).transform;
-    mx=tf&&tf!=='none'?new DOMMatrix(tf):null;
-    cx0=fr.left+fr.width/2; cy0=fr.top+fr.height/2;
-  }
   const PIX=2; /* размер пикселя дизера */
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
     const px=(x/PIX)|0, py=(y/PIX)|0;
     const i=y*FW+x;
-    if(cut){
-      /* буфер → локальные координаты элемента → страница (с зеркалом и поворотом) */
-      const u=(x+0.5)/FW*ew-ew/2, v=(y+0.5)/FH*eh-eh/2;
-      let pxx=cx0+u, pyy=cy0+v;
-      if(mx){ pxx=cx0+mx.a*u+mx.c*v; pyy=cy0+mx.b*u+mx.d*v; }
-      const mxx=Math.floor(pxx-cut.x0), myy=Math.floor(pyy-cut.y0);
-      if(mxx>=0&&myy>=0&&mxx<cut.w&&myy<cut.h&&cut.a[(myy*cut.w+mxx)*4+3]>127){ d[i*4+3]=0; continue; }
-    }
     const n=fbm(px*0.09,py*0.09,fseed);
     const er=Math.max(0,(28-x)/28);
     const thr=0.30+(n-0.5)*0.62+er*(0.10+0.22*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
@@ -745,6 +712,37 @@ balatro(document.getElementById('bg2'));
     x += cx.measureText(ch).width;
   }
 
+  /* те же буквы в маске пламени — вырез в полном разрешении */
+  const FLM=document.getElementById('flameMaskLetters');
+  const FLMASK=document.getElementById('flameCut');
+  const flameEl=document.getElementById('flame');
+  function placeFlameMask(){
+    if(!FLM||!FLMASK||!flameEl) return;
+    const fr=flameEl.getBoundingClientRect(), ew=flameEl.offsetWidth, eh=flameEl.offsetHeight;
+    if(!fr.width||!ew) return;
+    const cs=getComputedStyle(flameEl);
+    const m=cs.transform&&cs.transform!=='none'?new DOMMatrix(cs.transform):new DOMMatrix();
+    const det=m.a*m.d-m.b*m.c||1;
+    const cx0=fr.left+fr.width/2, cy0=fr.top+fr.height/2;
+    const plate=document.querySelector('.plate');
+    const pw=plate?plate.getBoundingClientRect().width:520;
+    const k=pw/520;
+    FLM.setAttribute('stroke-width',(8*k).toFixed(2));
+    FLMASK.setAttribute('width',ew); FLMASK.setAttribute('height',eh);
+    const bg=FLMASK.querySelector('rect');
+    if(bg){ bg.setAttribute('width',ew); bg.setAttribute('height',eh); }
+    while(FLM.children.length<pairs.length) FLM.appendChild(document.createElementNS(NS,'text'));
+    pairs.forEach(([a],i)=>{
+      const r=a.getBoundingClientRect(), el=FLM.children[i];
+      el.textContent=a.textContent;
+      el.setAttribute('font-size',(44*k).toFixed(2));
+      const dx=r.left+r.width/2-cx0, dy=r.top+r.height/2-cy0;
+      const u=(m.d*dx-m.c*dy)/det, v=(-m.b*dx+m.a*dy)/det;
+      el.setAttribute('x',(u+ew/2).toFixed(2));
+      el.setAttribute('y',(v+eh/2).toFixed(2));
+    });
+  }
+
   const jitter=()=>{
     for(const [a,b] of pairs){
       const rot=((Math.random()-.5)*7).toFixed(2);
@@ -752,9 +750,11 @@ balatro(document.getElementById('bg2'));
       const s=`rotate(${rot}deg) translateY(${dy}px)`;
       a.style.transform=s; b.style.transform=s;
     }
+    placeFlameMask();
   };
   jitter();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(jitter,1000);
+  addEventListener('resize',placeFlameMask);
 })();
 </script>
 
