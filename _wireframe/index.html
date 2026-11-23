@@ -62,8 +62,13 @@
   .soc:active{transform:translateY(-1px) rotate(-2deg)}
   .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1;transition:transform .18s ease-out}
   .soc:hover::before{background:var(--purple)}
-  .soc img{width:30px;height:30px;display:block;position:relative;z-index:2;image-rendering:pixelated}
+  .soc img{width:24px;height:24px;display:block;position:relative;z-index:2;image-rendering:pixelated}
   .soc:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+  .soc .tip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);
+    background:var(--ink);color:var(--paper);font-family:"Chaos16",monospace;font-size:13px;letter-spacing:.04em;
+    padding:3px 9px 2px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s ease-out,transform .15s ease-out;z-index:6}
+  .soc:hover .tip,.soc:focus-visible .tip{opacity:1;transform:translateX(-50%) translateY(0)}
+  .soc:hover .tip{background:var(--purple)}
 
   /* ── правая половина: экран ── */
   /* ── правая половина: тексты поверх куба ── */
@@ -80,7 +85,8 @@
   .tracks{position:relative;z-index:3;margin-top:auto}
   .tlabel{font-family:"Chaos16",monospace;font-size:21px;letter-spacing:.02em;color:var(--orange);text-align:right;margin-bottom:21px}
   .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
-  .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink)}
+  .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink);display:block;text-decoration:none}
+  #tagLetters text{paint-order:stroke fill;stroke:#E9E3D5;stroke-width:10px;stroke-linejoin:round}
   .track::before{content:"";position:absolute;inset:0;background:var(--paper);filter:url(#torn);z-index:-1}
   .track:nth-child(3n+1)::before{filter:url(#torn)}
   .track:nth-child(3n+2)::before{filter:url(#torn2)}
@@ -168,6 +174,23 @@
     letter-spacing:.1em;text-transform:uppercase;color:rgba(239,233,220,.65);
     border-top:1px solid rgba(239,233,220,.16);padding-top:21px}
 
+  /* ── доп. ссылки ── */
+  .xsec{position:relative;background:var(--night);color:#EFE9DC;padding:70px 60px 89px;overflow:hidden;z-index:1}
+  .xsec::before{content:"";position:absolute;top:-16px;left:0;right:0;height:34px;background:var(--night);filter:url(#torn);z-index:1}
+  .xsec #bg2{position:absolute;inset:0;width:100%;height:100%}
+  .xsec .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,2,15,.45) 0%,rgba(5,2,15,.72) 55%,rgba(5,2,15,.92) 100%)}
+  .xsec>*{position:relative}
+  .xsec h2{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(34px,5vw,55px);line-height:1;
+    letter-spacing:-.03em;text-transform:uppercase;margin-bottom:13px}
+  .xsec h2 em{font-style:normal;color:var(--orange)}
+  .xrow{display:flex;justify-content:space-between;align-items:baseline;gap:21px;padding:16px 0;
+    border-bottom:1px dashed rgba(239,233,220,.25);text-decoration:none;color:#EFE9DC}
+  .xrow b{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(18px,2.6vw,30px);line-height:1.1;
+    letter-spacing:-.01em;text-transform:uppercase;transition:color .2s,transform .2s}
+  .xrow span{font-family:"Chaos16",monospace;font-size:15px;color:rgba(239,233,220,.6);white-space:nowrap}
+  .xrow:hover b,.xrow:focus-visible b{color:var(--orange);transform:translateX(6px)}
+  .xrow:hover span{color:var(--orange)}
+
   :focus-visible{outline:2px solid var(--purple);outline-offset:3px}
   .foot :focus-visible{outline-color:var(--orange)}
   .vcard:focus-visible,.mail:focus-visible{outline:2px solid #fff;outline-offset:3px}
@@ -187,6 +210,7 @@
     .cubeWrap{display:none}
     .soc-bar{gap:7px;margin-top:16px}
     .soc{width:30px;height:30px}
+    .soc img{width:20px;height:20px}
     .about{margin-top:0}
     .about .lead{font-size:24px;margin-bottom:13px}
     .about p{font-size:17px;line-height:1.5;margin-bottom:9px}
@@ -213,6 +237,11 @@
     .vcard:not(:first-child) .vmeta{color:var(--orange)}
     .vcard:not(:first-child) .vmeta span{color:rgba(239,233,220,.7)}
     .vcard h3{font-size:13.5px;min-height:0}
+    .xsec{padding:48px 22px 55px}
+    .xsec h2{font-size:34px}
+    .xrow{padding:13px 0}
+    .xrow b{font-size:19px}
+    .xrow span{font-size:12px}
     .foot{grid-template-columns:1fr;column-gap:0;padding:55px 22px 28px}
     .foot .fh{font-size:15px}
     .mail{font-size:34px;letter-spacing:-.03em;margin-top:9px}
@@ -281,9 +310,9 @@
         <g id="tagLetters" aria-hidden="true" fill="var(--purple)" font-family="Chaos16, monospace" font-size="44" xml:space="preserve"></g>
       </svg>
       <div class="soc-bar">
-        <a class="soc" href="https://www.youtube.com/@artition1" aria-label="YouTube"><img src="assets/icons/youtube.png" alt="" width="40" height="40"></a>
-        <a class="soc" href="https://t.me/ArtitionStar" aria-label="Telegram"><img src="assets/icons/telegram.png" alt="" width="40" height="40"></a>
-        <a class="soc" href="https://www.tiktok.com/@artition" aria-label="TikTok"><img src="assets/icons/tiktok.png" alt="" width="40" height="40"></a>
+        <a class="soc" href="https://www.youtube.com/@artition1" aria-label="YouTube"><img src="assets/icons/youtube.png" alt="" width="40" height="40"><span class="tip" aria-hidden="true">YouTube</span></a>
+        <a class="soc" href="https://t.me/ArtitionStar" aria-label="Telegram"><img src="assets/icons/telegram.png" alt="" width="40" height="40"><span class="tip" aria-hidden="true">Telegram</span></a>
+        <a class="soc" href="https://www.tiktok.com/@artition" aria-label="TikTok"><img src="assets/icons/tiktok.png" alt="" width="40" height="40"><span class="tip" aria-hidden="true">TikTok</span></a>
       </div>
     </div>
   </div>
@@ -298,21 +327,21 @@
     <div class="tracks">
       <div class="tlabel">мои любимые треки</div>
       <div class="trow">
-        <div class="track">
+        <a class="track" href="https://youtu.be/K4oXveJK68Y?is=2Mn8LxUiVG7dk3dM" target="_blank" rel="noopener">
           <div class="cov"><canvas id="t1" width="120" height="120"></canvas><div class="no">01</div></div>
           <b>Рисунки</b><i>nyan.mp3</i>
           <div class="foil"></div>
-        </div>
-        <div class="track">
+        </a>
+        <a class="track" href="https://youtu.be/R3AXUGGvKXA?is=SZoi0il00bMggKZi" target="_blank" rel="noopener">
           <div class="cov"><canvas id="t2" width="120" height="120"></canvas><div class="no">02</div></div>
           <b>Рок звезда должна умереть</b><i>Lida</i>
           <div class="foil"></div>
-        </div>
-        <div class="track">
+        </a>
+        <a class="track" href="https://youtu.be/4vsCFMhT-Qk?is=1uvTA1rO0MhIlrZO" target="_blank" rel="noopener">
           <div class="cov"><canvas id="t3" width="120" height="120"></canvas><div class="no">03</div></div>
           <b>Пистолет</b><i>ПЛМ</i>
           <div class="foil"></div>
-        </div>
+        </a>
       </div>
     </div>
   </div>
@@ -360,6 +389,16 @@
     </a>
   </div>
   <!-- VIDEOS:END -->
+</section>
+
+<section class="xsec">
+  <canvas id="bg2" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+  <h2>ещё <em>ссылки</em></h2>
+  <a class="xrow" href="https://t.me/ArtitionStar/1715" target="_blank" rel="noopener"><b>Референс персонажа</b><span>t.me/ArtitionStar/1715</span></a>
+  <a class="xrow" href="http://t.me/anonaskbot?start=Artition" target="_blank" rel="noopener"><b>Анонимные сообщения</b><span>t.me/anonaskbot</span></a>
+  <a class="xrow" href="https://t.me/ArtitionShitpost" target="_blank" rel="noopener"><b>Щитпост канал</b><span>t.me/ArtitionShitpost</span></a>
+  <a class="xrow" href="https://t.me/ArtitionCf" target="_blank" rel="noopener"><b>Конфешенс</b><span>t.me/ArtitionCf</span></a>
 </section>
 
 <footer class="foot">
@@ -551,9 +590,9 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   addEventListener('resize',()=>{ clearTimeout(window.__rs); window.__rs=setTimeout(draw,120); });
 })();
 
-/* ── фон правой половины: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
-(function(){
-  const cvs=document.getElementById('bg');
+/* ── фон: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
+function balatro(cvs){
+  if(!cvs) return;
   function sizeBg(){
     const r=cvs.getBoundingClientRect();
     const w=Math.max(2,Math.round(r.width)), h=Math.max(2,Math.round(r.height));
@@ -629,7 +668,9 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-})();
+}
+balatro(document.getElementById('bg'));
+balatro(document.getElementById('bg2'));
 </script>
 
 <script>
@@ -654,7 +695,6 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       t.textContent=ch;
       t.style.transformBox='fill-box';
       t.style.transformOrigin='50% 50%';
-      t.style.transition='transform .4s cubic-bezier(.2,1.4,.4,1)';
       g.appendChild(t);
       return t;
     };
@@ -672,6 +712,21 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   };
   jitter();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(jitter,1000);
+})();
+</script>
+
+<script>
+/* ── глитч-дёрганье раз в секунду: треки, иконки, видео — резко, без интерполяции ── */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const els=[...document.querySelectorAll('.track,.soc,.vcard')];
+  setInterval(()=>{
+    if(document.hidden) return;
+    for(const el of els){
+      el.style.translate=`${((Math.random()-.5)*6).toFixed(1)}px ${((Math.random()-.5)*6).toFixed(1)}px`;
+      el.style.rotate=`${((Math.random()-.5)*3).toFixed(2)}deg`;
+    }
+  },1000);
 })();
 </script>
 
