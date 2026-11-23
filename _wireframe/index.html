@@ -50,7 +50,7 @@
   .plate .nm text{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:138px;letter-spacing:-4.8px;fill:var(--ink)}
 
   #flame{position:absolute;left:-300px;top:-10px;width:480px;height:960px;image-rendering:pixelated;z-index:1;
-    transform:rotate(-3deg) scaleX(-1);-webkit-mask:url(#flameCut);mask:url(#flameCut)}
+    transform:rotate(-3deg) scaleX(-1)}
 
   /* ── куб: чёрно-белый дизер ── */
   .cubeWrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1200px;height:1200px;z-index:1;pointer-events:none}
@@ -120,15 +120,17 @@
   .vhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:55px}
   .vhead h2{font-family:"UnboundedX";font-weight:900;font-size:89px;line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
   .vnote{font-family:"Chaos16",monospace;font-size:21px;color:var(--purple);text-align:right;line-height:1.2}
-  .vgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:0 34px}
+  .vgrid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:1fr;gap:0 34px}
   .vcard{position:relative;isolation:isolate;display:block;padding:9px 9px 13px;color:#EFE9DC;text-decoration:none}
-  .vcard:first-child{grid-column:1/8;grid-row:1/span 5}
-  .vcard:first-child h3{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:28px;line-height:1.1;text-transform:uppercase;letter-spacing:-.01em;min-height:0;max-width:100%}
-  .vcard:not(:first-child){grid-column:8/13;display:grid;grid-template-columns:150px 1fr;gap:0 16px;align-items:center;
+  .vcard:first-child{grid-column:1/8;grid-row:1/span 5;align-self:start}
+  .vcard:first-child h3{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:24px;line-height:1.1;text-transform:uppercase;letter-spacing:-.01em;min-height:0;max-width:100%}
+  .vcard:not(:first-child){grid-column:8/13;align-self:stretch;display:grid;grid-template-columns:150px 1fr;gap:0 16px;align-items:center;
     padding:12px 0;color:var(--ink);transform:none;border-bottom:1px dashed rgba(23,18,16,.35)}
   .vcard:not(:first-child)::before,.vcard:not(:first-child) .foil{display:none}
   .vcard:not(:first-child) .shot{grid-row:1/3}
-  .vcard:not(:first-child) h3{min-height:0;margin:0;max-width:100%}
+  .vcard:not(:first-child) h3{min-height:0;margin:0;max-width:100%;font-size:14px;line-height:1.35;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .vcard:not(:first-child) .shot{height:100%;aspect-ratio:auto;align-self:stretch}
   .vcard:not(:first-child) .vmeta{color:var(--purple)}
   .vcard:not(:first-child) .vmeta span{color:rgba(23,18,16,.7)}
   .vcard:nth-child(3n+1)::before{filter:url(#torn)}
@@ -143,7 +145,7 @@
     letter-spacing:.04em;color:#EFE9DC;background:rgba(12,7,24,.85);padding:3px 8px 2px}
   .shot canvas{display:block;width:100%;height:100%}
   .shot .dur{position:absolute;right:7px;bottom:6px;font-family:"Chaos16";font-size:14px;color:var(--paper)}
-  .vcard h3{font-size:14.5px;line-height:1.3;font-weight:400;margin-top:10px;max-width:94%;min-height:2.6em}
+  .vcard h3{font-family:"UnboundedX",sans-serif;font-size:15px;line-height:1.35;font-weight:400;margin-top:10px;max-width:94%;min-height:2.6em}
   .vmeta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:7px;
     font-family:"Chaos16",monospace;font-size:15px;color:var(--orange)}
   .vmeta b{font-weight:400}
@@ -187,6 +189,9 @@
   .xrow b{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(18px,2.6vw,30px);line-height:1.1;
     letter-spacing:-.01em;text-transform:uppercase;transition:color .2s,transform .2s}
   .xrow span{font-family:"Chaos16",monospace;font-size:15px;color:rgba(239,233,220,.6);white-space:nowrap}
+  .xrow .xi{width:30px;height:30px;image-rendering:pixelated;align-self:center;flex:none;
+    filter:brightness(0) invert(1);transition:filter .2s,transform .25s}
+  .xrow:hover .xi,.xrow:focus-visible .xi{filter:none;transform:translateX(5px)}
   .xrow:hover b,.xrow:focus-visible b{color:var(--orange);transform:translateX(6px)}
   .xrow:hover span{color:var(--orange)}
 
@@ -241,6 +246,7 @@
     .xrow{padding:13px 0}
     .xrow b{font-size:19px}
     .xrow span{font-size:12px}
+    .xrow .xi{width:24px;height:24px}
     .foot{grid-template-columns:1fr;column-gap:0;padding:55px 22px 28px}
     .foot .fh{font-size:15px}
     .mail{font-size:34px;letter-spacing:-.03em;margin-top:9px}
@@ -265,16 +271,6 @@
     <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="42" result="n"/>
     <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
-</svg>
-
-<svg width="0" height="0" aria-hidden="true" style="position:absolute;left:0;top:0">
-  <defs>
-    <mask id="flameCut" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" width="480" height="960">
-      <rect x="0" y="0" width="480" height="960" fill="#fff"/>
-      <g id="flameMaskLetters" fill="#000" stroke="#000" stroke-width="8" stroke-linejoin="round"
-         font-family="Chaos16, monospace" text-anchor="middle" dominant-baseline="middle"></g>
-    </mask>
-  </defs>
 </svg>
 
 <div class="screen">
@@ -367,34 +363,34 @@
   <!-- VIDEOS:START -->
   <div class="vgrid">
     <a class="vcard" href="https://www.youtube.com/watch?v=iXiOvUcmyuk">
-      <div class="shot"><canvas id="v1" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">2:02</span></div>
+      <div class="shot"><canvas id="v1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">2:02</span></div>
       <h3>Machine Startup | mod VFXWeaver showcase</h3>
-      <div class="vmeta"><span>2 месяца назад</span></div>
+      <div class="vmeta"><span>1,5 тыс. просмотров</span></div>
     </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=YxrAz_jDg-o">
-      <div class="shot"><canvas id="v2" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">4:12</span></div>
+      <div class="shot"><canvas id="v2" data-fit="1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">4:12</span></div>
       <h3>Мяукаю разными голосами на протяжении 4 минут 12 секунд</h3>
-      <div class="vmeta"><span>5 месяцев назад</span></div>
+      <div class="vmeta"><span>4,1 тыс. просмотров</span></div>
     </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=BeIPPA7L8Vo">
-      <div class="shot"><canvas id="v3" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">10:25</span></div>
+      <div class="shot"><canvas id="v3" data-fit="1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">10:25</span></div>
       <h3>В погоне за славой</h3>
-      <div class="vmeta"><span>7 месяцев назад</span></div>
+      <div class="vmeta"><span>1,9 тыс. просмотров</span></div>
     </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=PyI2Q5AMkfw">
-      <div class="shot"><canvas id="v4" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">20:24</span></div>
+      <div class="shot"><canvas id="v4" data-fit="1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">20:24</span></div>
       <h3>Mslan - скрытый гость острова Эпштейна? | КУБЕКЕ интервью</h3>
-      <div class="vmeta"><span>8 месяцев назад</span></div>
+      <div class="vmeta"><span>63,7 тыс. просмотров</span></div>
     </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=XxTPc5zvvro">
-      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">5:04</span></div>
+      <div class="shot"><canvas id="v5" data-fit="1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">5:04</span></div>
       <h3>2D-аниматор vs ИИ — может ли нейросеть заменить человека?</h3>
-      <div class="vmeta"><span>11 месяцев назад</span></div>
+      <div class="vmeta"><span>25,1 тыс. просмотров</span></div>
     </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=R3AXUGGvKXA">
-      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><div class="foil"></div><span class="vdur">2:06</span></div>
+      <div class="shot"><canvas id="v6" data-fit="1" width="640" height="360"></canvas><div class="foil"></div><span class="vdur">2:06</span></div>
       <h3>Lida - Рок звезда должна умереть | Клип</h3>
-      <div class="vmeta"><span>1 год назад</span></div>
+      <div class="vmeta"><span>6,3 тыс. просмотров</span></div>
     </a>
   </div>
   <!-- VIDEOS:END -->
@@ -404,10 +400,10 @@
   <canvas id="bg2" aria-hidden="true"></canvas>
   <div class="veil" aria-hidden="true"></div>
   <h2>ещё <em>ссылки</em></h2>
-  <a class="xrow" href="https://t.me/ArtitionStar/1715" target="_blank" rel="noopener"><b>Референс персонажа</b><span>t.me/ArtitionStar/1715</span></a>
-  <a class="xrow" href="http://t.me/anonaskbot?start=Artition" target="_blank" rel="noopener"><b>Анонимные сообщения</b><span>t.me/anonaskbot</span></a>
-  <a class="xrow" href="https://t.me/ArtitionShitpost" target="_blank" rel="noopener"><b>Щитпост канал</b><span>t.me/ArtitionShitpost</span></a>
-  <a class="xrow" href="https://t.me/ArtitionCf" target="_blank" rel="noopener"><b>Конфешенс</b><span>t.me/ArtitionCf</span></a>
+  <a class="xrow" href="https://t.me/ArtitionStar/1715" target="_blank" rel="noopener"><b>Референс персонажа</b><img class="xi" src="assets/icons/telegram.png" alt="" aria-hidden="true"></a>
+  <a class="xrow" href="http://t.me/anonaskbot?start=Artition" target="_blank" rel="noopener"><b>Анонимные сообщения</b><img class="xi" src="assets/icons/telegram.png" alt="" aria-hidden="true"></a>
+  <a class="xrow" href="https://t.me/ArtitionShitpost" target="_blank" rel="noopener"><b>Щитпост канал</b><img class="xi" src="assets/icons/telegram.png" alt="" aria-hidden="true"></a>
+  <a class="xrow" href="https://t.me/ArtitionCf" target="_blank" rel="noopener"><b>Конфешенс</b><img class="xi" src="assets/icons/telegram.png" alt="" aria-hidden="true"></a>
 </section>
 
 <footer class="foot">
@@ -452,12 +448,54 @@ for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
   soft[y*FW+x]*=ex*ey;
 }
 let fseed=1;
+/* маска выреза: подзаголовок с обводкой, отрисованный в координатах страницы */
+function tagCutMask(){
+  const plate=document.querySelector('.plate');
+  const ts=[...document.querySelectorAll('#tagLetters text')];
+  if(!plate||!ts.length) return null;
+  const pw=plate.getBoundingClientRect().width; if(!pw) return null;
+  const scale=pw/520, fs=44*scale, sw=20*scale;
+  const items=[];
+  for(const t of ts){
+    const ch=t.textContent, r=t.getBoundingClientRect();
+    if(!ch.trim()||(!r.width&&!r.height)) continue;
+    items.push({ch,r});
+  }
+  if(!items.length) return null;
+  const x0=Math.min(...items.map(i=>i.r.left))-sw, y0=Math.min(...items.map(i=>i.r.top))-sw;
+  const x1=Math.max(...items.map(i=>i.r.right))+sw, y1=Math.max(...items.map(i=>i.r.bottom))+sw;
+  const w=Math.ceil(x1-x0), h=Math.ceil(y1-y0);
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const g=c.getContext('2d');
+  g.font=`${fs}px Chaos16`; g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle='#000'; g.strokeStyle='#000'; g.lineWidth=sw; g.lineJoin='round';
+  for(const {ch,r} of items){
+    const xm=r.left+r.width/2-x0, ym=r.top+r.height/2-y0;
+    g.strokeText(ch,xm,ym); g.fillText(ch,xm,ym);
+  }
+  return {a:g.getImageData(0,0,w,h).data,w,h,x0,y0};
+}
 function drawFlame(){
   const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
+  /* вырез в пламени по контуру букв подзаголовка */
+  const fr=fc.getBoundingClientRect(), cut=fr.width?tagCutMask():null;
+  let cx0=fr.left+fr.width/2, cy0=fr.top+fr.height/2, mx=null, ew=fc.offsetWidth, eh=fc.offsetHeight;
+  if(cut){
+    const tf=getComputedStyle(fc).transform;
+    mx=tf&&tf!=='none'?new DOMMatrix(tf):null;
+  }
   const PIX=2; /* размер пикселя дизера */
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
     const px=(x/PIX)|0, py=(y/PIX)|0;
     const i=y*FW+x;
+    if(cut){
+      /* буфер → локальные координаты элемента → страница (с зеркалом и поворотом) */
+      const u=(x+0.5)/FW*ew-ew/2, v=(y+0.5)/FH*eh-eh/2;
+      let pxx=cx0+u, pyy=cy0+v;
+      if(mx){ pxx=cx0+mx.a*u+mx.c*v; pyy=cy0+mx.b*u+mx.d*v; }
+      const mxx=Math.floor(pxx-cut.x0), myy=Math.floor(pyy-cut.y0);
+      if(mxx>=0&&myy>=0&&mxx<cut.w&&myy<cut.h&&cut.a[(myy*cut.w+mxx)*4+3]>127){ d[i*4+3]=0; continue; }
+    }
     const n=fbm(px*0.09,py*0.09,fseed);
     const er=Math.max(0,(28-x)/28);
     const thr=0.30+(n-0.5)*0.62+er*(0.10+0.22*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
@@ -480,6 +518,11 @@ if(!RMF) setInterval(()=>{ if(!inViewF||document.hidden) return; fseed=(fseed%50
 /* ── обложки треков (заглушки) ── */
 function sizeCanvas(cvs,ratio,div){
   const d=div||3;
+  if(ratio===0){ /* по фактической коробке: без растяжения, только кадрирование */
+    const w=Math.max(12,Math.round(cvs.clientWidth)), h=Math.max(12,Math.round(cvs.clientHeight));
+    if(cvs.width!==w||cvs.height!==h){ cvs.width=w; cvs.height=h; }
+    return;
+  }
   const w=Math.max(12,Math.round(cvs.clientWidth/d)), h=Math.max(12,Math.round(w/(ratio||1)));
   if(cvs.width!==w||cvs.height!==h){ cvs.width=w; cvs.height=h; }
 }
@@ -566,6 +609,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   const L=document.querySelector('.paperPanel'), R=document.querySelector('.bgPanel');
   const h=i=>{ let n=i*374761393+668265263; n=(n^(n>>13))*1274126177; return ((n^(n>>16))>>>0)/4294967295; };
   const vn=i=>{ const a=h(Math.floor(i)),b=h(Math.floor(i)+1),f=i-Math.floor(i),u=f*f*(3-2*f); return a*(1-u)+b*u; };
+  let ns=Math.floor(Math.random()*400);
   function draw(){
     if(matchMedia('(max-width:900px)').matches){
       const W=R.offsetWidth||innerWidth, H=R.offsetHeight||500, step=9, amp=11;
@@ -582,7 +626,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       L.style.clipPath='none';
     }else{
       const W=R.offsetWidth||720,H=R.offsetHeight||1000,step=9,amp=13,pts=[];
-      for(let y=0;y<=H;y+=step){ const t=y/step; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
+      for(let y=0;y<=H;y+=step){ const t=y/step+ns; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
       const bot=[];
       for(let x=0;x<=W;x+=step){ const t2=x/step; const n2=vn(t2+61)*.65+vn(t2*3.1+17)*.35; bot.push(`${(x-n2*amp).toFixed(1)}px ${H}px`); }
       R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),...bot,`${W}px 0`].join(',')})`;
@@ -598,6 +642,17 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   }
   draw();
   addEventListener('resize',()=>{ clearTimeout(window.__rs); window.__rs=setTimeout(draw,120); });
+
+  /* ── раз в секунду: новое семя шума у кромки и у рваных подложек ── */
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const seams=[...document.querySelectorAll('filter[id^="torn"] feTurbulence')];
+    setInterval(()=>{
+      if(document.hidden) return;
+      ns=Math.floor(Math.random()*400);
+      draw();
+      for(const f of seams) f.setAttribute('seed', String(1+Math.floor(Math.random()*900)));
+    },1000);
+  }
 })();
 
 /* ── фон: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
@@ -712,37 +767,6 @@ balatro(document.getElementById('bg2'));
     x += cx.measureText(ch).width;
   }
 
-  /* те же буквы в маске пламени — вырез в полном разрешении */
-  const FLM=document.getElementById('flameMaskLetters');
-  const FLMASK=document.getElementById('flameCut');
-  const flameEl=document.getElementById('flame');
-  function placeFlameMask(){
-    if(!FLM||!FLMASK||!flameEl) return;
-    const fr=flameEl.getBoundingClientRect(), ew=flameEl.offsetWidth, eh=flameEl.offsetHeight;
-    if(!fr.width||!ew) return;
-    const cs=getComputedStyle(flameEl);
-    const m=cs.transform&&cs.transform!=='none'?new DOMMatrix(cs.transform):new DOMMatrix();
-    const det=m.a*m.d-m.b*m.c||1;
-    const cx0=fr.left+fr.width/2, cy0=fr.top+fr.height/2;
-    const plate=document.querySelector('.plate');
-    const pw=plate?plate.getBoundingClientRect().width:520;
-    const k=pw/520;
-    FLM.setAttribute('stroke-width',(8*k).toFixed(2));
-    FLMASK.setAttribute('width',ew); FLMASK.setAttribute('height',eh);
-    const bg=FLMASK.querySelector('rect');
-    if(bg){ bg.setAttribute('width',ew); bg.setAttribute('height',eh); }
-    while(FLM.children.length<pairs.length) FLM.appendChild(document.createElementNS(NS,'text'));
-    pairs.forEach(([a],i)=>{
-      const r=a.getBoundingClientRect(), el=FLM.children[i];
-      el.textContent=a.textContent;
-      el.setAttribute('font-size',(44*k).toFixed(2));
-      const dx=r.left+r.width/2-cx0, dy=r.top+r.height/2-cy0;
-      const u=(m.d*dx-m.c*dy)/det, v=(-m.b*dx+m.a*dy)/det;
-      el.setAttribute('x',(u+ew/2).toFixed(2));
-      el.setAttribute('y',(v+eh/2).toFixed(2));
-    });
-  }
-
   const jitter=()=>{
     for(const [a,b] of pairs){
       const rot=((Math.random()-.5)*7).toFixed(2);
@@ -750,11 +774,9 @@ balatro(document.getElementById('bg2'));
       const s=`rotate(${rot}deg) translateY(${dy}px)`;
       a.style.transform=s; b.style.transform=s;
     }
-    placeFlameMask();
   };
   jitter();
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(jitter,1000);
-  addEventListener('resize',placeFlameMask);
 })();
 </script>
 
@@ -766,10 +788,59 @@ balatro(document.getElementById('bg2'));
   setInterval(()=>{
     if(document.hidden) return;
     for(const el of els){
+      if(el.__drag) continue;
       el.style.translate=`${((Math.random()-.5)*2.4).toFixed(1)}px ${((Math.random()-.5)*2.4).toFixed(1)}px`;
       el.style.rotate=`${((Math.random()-.5)*1.2).toFixed(2)}deg`;
     }
   },1000);
+})();
+
+/* ── перетаскивание: превью видео, соцсети, треки, логотип ── */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const targets=[...document.querySelectorAll('.vcard .shot,.soc,.track,.mark img,.mark svg')];
+  for(const el of targets){
+    el.style.touchAction='none';
+    let st=null;
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0) return;
+      st={x:e.clientX,y:e.clientY,dx:0,dy:0,moved:false,id:e.pointerId,anim:null};
+      el.__drag=st;
+      if(el.__return){ el.__return.cancel(); el.__return=null; }
+      el.setPointerCapture(e.pointerId);
+    });
+    el.addEventListener('pointermove',e=>{
+      if(!st||e.pointerId!==st.id) return;
+      st.dx=e.clientX-st.x; st.dy=e.clientY-st.y;
+      if(!st.moved&&Math.hypot(st.dx,st.dy)>5){ st.moved=true; el.style.cursor='grabbing'; }
+      if(!st.moved) return;
+      const d=Math.hypot(st.dx,st.dy);
+      el.style.translate=`${st.dx.toFixed(1)}px ${st.dy.toFixed(1)}px`;
+      el.style.rotate=`${(st.dx*0.05).toFixed(2)}deg`;
+      el.style.scale=`${(1+d*0.0009).toFixed(3)} ${Math.max(.6,1-d*0.0006).toFixed(3)}`;
+    });
+    const end=()=>{
+      if(!st) return;
+      const {dx,dy,moved}=st;
+      el.__drag=null;
+      el.style.cursor='';
+      if(!moved){ st=null; return; }
+      el.__clickBlock=true;
+      const rot=dx*0.05, d=Math.hypot(dx,dy);
+      const a=el.animate([
+        {translate:`${dx}px ${dy}px`,rotate:`${rot}deg`,scale:`${1+d*0.0009} ${Math.max(.6,1-d*0.0006)}`},
+        {translate:'0px 0px',rotate:'0deg',scale:'1 1'}
+      ],{duration:620,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'none'});
+      el.__return=a;
+      a.onfinish=()=>{ el.style.translate=''; el.style.rotate=''; el.style.scale=''; el.__return=null; };
+      st=null;
+    };
+    el.addEventListener('pointerup',end);
+    el.addEventListener('pointercancel',end);
+    el.addEventListener('click',e=>{
+      if(el.__clickBlock){ el.__clickBlock=false; e.preventDefault(); e.stopPropagation(); }
+    },true);
+  }
 })();
 </script>
 
@@ -971,7 +1042,46 @@ balatro(document.getElementById('bg2'));
       }
     }
 
-    const Q8=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+    /* вырез по контуру текста («делаю всё по-немножку» + абзацы) */
+  const textCut={sig:'',canvas:null,x0:0,y0:0};
+  function buildTextCut(){
+    const els=[document.querySelector('.about .lead'),...document.querySelectorAll('.about p')];
+    const items=[];
+    for(const el of els){ if(!el) continue; const r=el.getBoundingClientRect(); if(r.width) items.push({el,r}); }
+    if(!items.length) return null;
+    const pad=16;
+    const x0=Math.min(...items.map(i=>i.r.left))-pad, x1=Math.max(...items.map(i=>i.r.right))+pad;
+    const y0=Math.min(...items.map(i=>i.r.top))-pad, y1=Math.max(...items.map(i=>i.r.bottom))+pad;
+    const w=Math.ceil(x1-x0), h=Math.ceil(y1-y0);
+    if(w<=0||h<=0) return null;
+    const sig=[w,h,...items.map(i=>Math.round(i.r.left)+'/'+Math.round(i.r.top)+'/'+Math.round(i.r.width))].join('|');
+    if(sig===textCut.sig&&textCut.canvas) return textCut.canvas;
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const g=c.getContext('2d');
+    g.fillStyle='#000'; g.strokeStyle='#000'; g.lineJoin='round'; g.lineCap='round';
+    for(const {el,r} of items){
+      const cs=getComputedStyle(el), fs=parseFloat(cs.fontSize);
+      const lh=parseFloat(cs.lineHeight)||fs*1.4;
+      g.font=cs.fontStyle+' '+cs.fontWeight+' '+fs+'px '+cs.fontFamily;
+      g.lineWidth=Math.max(4,fs*(el.classList.contains('lead')?0.30:0.18));
+      let txt=(el.textContent||'').trim().replace(/\s+/g,' ');
+      if(cs.textTransform==='uppercase') txt=txt.toUpperCase();
+      const words=txt.split(' '), lines=[]; let line='';
+      for(const wd of words){
+        const t=line?line+' '+wd:wd;
+        if(g.measureText(t).width>r.width&&line){ lines.push(line); line=wd; } else line=t;
+      }
+      if(line) lines.push(line);
+      lines.forEach((ln,i)=>{
+        const yy=r.top-y0+fs*0.8+i*lh;
+        g.strokeText(ln,r.left-x0,yy); g.fillText(ln,r.left-x0,yy);
+      });
+    }
+    textCut.canvas=c; textCut.sig=sig; textCut.x0=x0; textCut.y0=y0;
+    return c;
+  }
+
+  const Q8=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
 
     /* вершины грани, выбранные фильтром, идут в порядке массива, а не по кругу —
        без сортировки по углу полигон получается «бабочкой» и рисует крест */
@@ -1029,6 +1139,15 @@ balatro(document.getElementById('bg2'));
     /* куски */
     ctx.clearRect(0,0,A,A);
     ctx.drawImage(src,0,0);
+
+    /* вырез по контуру текста: куб и его обломки не заходят в обводку букв */
+    const tc=buildTextCut();
+    if(tc){
+      const cr=cv.getBoundingClientRect();
+      ctx.globalCompositeOperation='destination-out';
+      ctx.drawImage(tc,textCut.x0-cr.left,textCut.y0-cr.top);
+      ctx.globalCompositeOperation='source-over';
+    }
   }
   frame(performance.now());
   setInterval(()=>frame(performance.now()), 33);
@@ -1057,15 +1176,17 @@ balatro(document.getElementById('bg2'));
     const c=document.getElementById(id);
     if(!c) return;
     c.setAttribute('aria-hidden','true');
-    sizeCanvas(c,16/9,1);
+    const box=c.dataset.fit==='1'?0:16/9;
+    sizeCanvas(c,box,1);
     if(!vid){ ditherCanvas(c,{cell:3,levels:3,stops,field}); return; }
     if(thumbCache[vid]){ drawPhoto(c,thumbCache[vid]); return; }
     const img=new Image();
-    img.onload=()=>{ thumbCache[vid]=img; const cc=document.getElementById(id); if(cc){ sizeCanvas(cc,16/9,1); drawPhoto(cc,img); } };
+    img.onload=()=>{ thumbCache[vid]=img; const cc=document.getElementById(id); if(cc){ sizeCanvas(cc,box,1); drawPhoto(cc,img); } };
     img.onerror=()=>{ const cc=document.getElementById(id); if(cc) ditherCanvas(cc,{cell:3,levels:3,stops,field}); };
     img.src='assets/thumbs/'+vid+'.jpg';
   }
   specs.forEach(([id,vid,stops,field])=>drawVideo(id,vid,stops,field));
+  addEventListener('resize',()=>{ clearTimeout(window.__vs); window.__vs=setTimeout(()=>{ specs.forEach(([id,vid,stops,field])=>drawVideo(id,vid,stops,field)); },160); });
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
     specs.forEach(([id,vid,stops,field])=>{ const c=document.getElementById(id); if(!c) return;
       const w=Math.min(880,Math.max(12,c.clientWidth)), h=Math.max(12,Math.round(w/(16/9)));
