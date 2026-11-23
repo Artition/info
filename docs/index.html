@@ -106,6 +106,12 @@
     background:linear-gradient(115deg,transparent 26%,rgba(0,255,170,.42) 36%,rgba(255,0,190,.46) 44%,rgba(120,80,255,.42) 52%,rgba(255,180,0,.38) 60%,transparent 70%);
     background-size:200% 200%;background-position:var(--fx,50%) var(--fy,50%);mix-blend-mode:overlay}
   .track:hover .foil,.vcard:hover .foil{opacity:1}
+
+  /* шейдерная фольга: рисуется в WebGL и копируется в канвас карточки */
+  html.gfol .track .foil,html.gfol .vcard .foil{background:none;animation:none;opacity:1 !important}
+  html.gfol .track .foil canvas,html.gfol .vcard .foil canvas{position:absolute;inset:0;width:100%;height:100%;
+    mix-blend-mode:overlay;opacity:0;transition:opacity .22s;display:block}
+  html.gfol .foil.hot canvas{opacity:.9}
   @media (hover:none){
     .track .foil,.vcard .foil{opacity:.55;animation:foil 6s linear infinite alternate}
     @keyframes foil{to{background-position:100% 100%}}
@@ -1282,6 +1288,112 @@ balatro(document.getElementById('bg2'));
   }
   draw();
   addEventListener('resize',()=>{ clearTimeout(window.__fs); window.__fs=setTimeout(draw,150); });
+})();
+</script>
+<script>
+/* ── фольга как в Balatro: спектр по нормали, блик от курсора, свечение кромки, зерно ──
+   один WebGL-контекст рисует 320×320, оттуда картинка копируется в канвас наведённой карты. */
+(function(){
+  const foils=[...document.querySelectorAll('.track .foil,.vcard .foil')];
+  if(!foils.length) return;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const glc=document.createElement('canvas');
+  glc.width=glc.height=320;
+  const gl=glc.getContext('webgl',{alpha:true,premultipliedAlpha:true,antialias:false});
+  if(!gl) return;
+
+  const VS=`attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
+  const FS=`precision highp float;
+uniform vec2 u_res, u_mouse; uniform float u_time, u_fade;
+void main(){
+  vec2 uv=gl_FragCoord.xy/u_res;
+  vec2 p=uv-0.5;
+  /* металлическая полоса: диагональ + медленный дрейф */
+  float t=dot(p,vec2(0.82,0.57))*2.1+0.5+sin(u_time*0.30)*0.14;
+  /* блик, который тянется к курсору */
+  vec2 m=(u_mouse-0.5)*0.75;
+  float hl=smoothstep(0.60,0.02,length((p-m)*vec2(1.0,1.5)));
+  /* радужный спектр */
+  vec3 spec=0.5+0.5*cos(6.28318*(t+vec3(0.0,0.33,0.67)));
+  /* полосы фольги, как на голограмме */
+  float band=0.5+0.5*sin(t*6.28318*3.0+u_time*0.9);
+  band=pow(band,2.2);
+  /* свечение кромки */
+  vec2 e=min(uv,1.0-uv);
+  float edge=smoothstep(0.055,0.0,min(e.x,e.y));
+  /* зерно */
+  float g=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);
+  vec3 col=spec*(0.55+1.15*band)+vec3(1.0)*edge*0.65+g*0.10;
+  float a=(0.30+0.55*hl+0.55*edge)*(0.55+0.45*band);
+  gl_FragColor=vec4(col,clamp(a,0.0,1.0)*u_fade);
+}`;
+
+  function sh(type,src){
+    const x=gl.createShader(type); gl.shaderSource(x,src); gl.compileShader(x);
+    if(!gl.getShaderParameter(x,gl.COMPILE_STATUS)){ console.warn('GLSL:',gl.getShaderInfoLog(x)); return null; }
+    return x;
+  }
+  const vs=sh(gl.VERTEX_SHADER,VS), fs_=sh(gl.FRAGMENT_SHADER,FS);
+  if(!vs||!fs_) return;
+  const pr=gl.createProgram(); gl.attachShader(pr,vs); gl.attachShader(pr,fs_); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) return;
+  gl.useProgram(pr);
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,'p');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U={res:gl.getUniformLocation(pr,'u_res'),mouse:gl.getUniformLocation(pr,'u_mouse'),
+           time:gl.getUniformLocation(pr,'u_time'),fade:gl.getUniformLocation(pr,'u_fade')};
+  gl.uniform2f(U.res,320,320);
+
+  document.documentElement.classList.add('gfol');
+
+  const items=foils.map(host=>{
+    const card=host.closest('.track,.vcard');
+    const cv=document.createElement('canvas');
+    cv.width=cv.height=256;
+    host.appendChild(cv);
+    return {host,card,cv,ctx:cv.getContext('2d'),fade:0,mx:0.5,my:0.5,on:false};
+  });
+
+  let cur=null, timer=0, t0=performance.now();
+
+  function frame(){
+    const now=performance.now();
+    const time=reduced?0:(now-t0)/1000;
+    let dirty=false;
+    for(const it of items){
+      const want=it.on?1:0;
+      if(Math.abs(it.fade-want)>0.01){ it.fade+=(want-it.fade)*0.18; dirty=true; }
+      else it.fade=want;
+      if(it.fade<0.02) continue;
+      /* перерисовываем только тот, что сейчас виден */
+      gl.uniform1f(U.time,time);
+      gl.uniform2f(U.mouse,it.mx,it.my);
+      gl.uniform1f(U.fade,it.fade);
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+      it.ctx.clearRect(0,0,256,256);
+      it.ctx.drawImage(glc,0,0,256,256);
+    }
+    if(!dirty && items.every(i=>i.fade===0)){ clearInterval(timer); timer=0; }
+  }
+  function run(){ if(!timer){ timer=setInterval(frame,33); } }
+
+  for(const it of items){
+    const enter=()=>{ it.on=true; it.host.classList.add('hot'); run(); };
+    const leave=()=>{ it.on=false; it.host.classList.remove('hot'); run(); };
+    it.card.addEventListener('mouseenter',enter);
+    it.card.addEventListener('mouseleave',leave);
+    it.card.addEventListener('focusin',enter);
+    it.card.addEventListener('focusout',leave);
+    it.card.addEventListener('mousemove',e=>{
+      const r=it.card.getBoundingClientRect();
+      it.mx=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+      it.my=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height));
+      it.on=true; run();
+    });
+  }
 })();
 </script>
 </body>
