@@ -384,11 +384,10 @@ function ramp(t,st){ for(let i=1;i<st.length;i++){ if(t<=st[i][0]){ const a=st[i
 /* ── пламя: маска логотипа, рваная кромка, крупный дизер ── */
 const FLAME=[".1..",".11.",".11.",".11.","111.","1111","1111","1111"];
 const fc=document.getElementById('flame'), FW=160, FH=320, NC=4, NR=8;
-const mask=new Float32Array(FW*FH), MX0=-20, MX1=140, MY0=8, MY1=312, cw=(MX1-MX0)/NC, ch=(MY1-MY0)/NR;
+const mask=new Float32Array(FW*FH), cw=FW/NC, ch=FH/NR;
 for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
-  const fx=(x-MX0)/cw, fy=(y-MY0)/ch;
-  const c=(fx<0||fx>=NC)?-1:Math.min(NC-1,fx|0), r=(fy<0||fy>=NR)?-1:Math.min(NR-1,fy|0);
-  mask[y*FW+x]=(c>=0&&r>=0&&FLAME[r][c]==='1')?1:0;
+  const c=Math.min(3,(x/cw)|0), r=Math.min(7,(y/ch)|0);
+  mask[y*FW+x]=FLAME[r][c]==='1'?1:0;
 }
 function blur(src,w,h,r){ const tmp=new Float32Array(w*h),out=new Float32Array(w*h);
   for(let y=0;y<h;y++){ let acc=0; for(let x=-r;x<w+r;x++){ const xa=Math.min(w-1,Math.max(0,x+r)),xr=Math.min(w-1,Math.max(0,x-r-1));
@@ -397,6 +396,10 @@ function blur(src,w,h,r){ const tmp=new Float32Array(w*h),out=new Float32Array(w
     acc+=tmp[ya*w+x]-(y-r-1>=0?tmp[yr*w+x]:0); out[Math.min(h-1,Math.max(0,y))*w+x]=acc/(2*r+1); } }
   return out; }
 const soft=blur(blur(mask,FW,FH,7),FW,FH,7);
+for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
+  const ex=Math.min(1,x/18), ey=Math.min(1,Math.min(y,FH-1-y)/10);
+  soft[y*FW+x]*=ex*ey;
+}
 let fseed=1;
 function drawFlame(){
   const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
@@ -404,8 +407,8 @@ function drawFlame(){
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
     const px=(x/PIX)|0, py=(y/PIX)|0;
     const i=y*FW+x, n=fbm(px*0.09,py*0.09,fseed);
-    const er=Math.max(0,(x-95)/45);
-    const thr=0.30+(n-0.5)*0.62+er*(0.18+0.30*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
+    const er=Math.max(0,(28-x)/28);
+    const thr=0.30+(n-0.5)*0.62+er*(0.10+0.22*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
     if(soft[i] <= thr){ d[i*4+3]=0; continue; }
     let v=0.22+(y/FH)*0.55+(n-0.5)*0.2;
     const th=(B4[py%4][px%4]+0.5)/16, lv=4;
