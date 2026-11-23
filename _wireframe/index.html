@@ -23,7 +23,10 @@
   body{width:100%;background:var(--paper);color:var(--ink);font-family:"Montserrat",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-  .screen{position:relative;display:grid;grid-template-columns:1fr 1fr;height:auto;min-height:100svh;max-height:none;overflow:hidden}
+  .screen{position:relative;display:grid;grid-template-columns:1fr 1fr;height:auto;min-height:100svh;max-height:none;overflow:hidden;
+    background-color:var(--paper)}
+  .screen::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image:url("assets/paper.png");background-size:cover;background-position:center;opacity:.22;mix-blend-mode:multiply}
 
   /* ── фоновые панели: под кубом ── */
   .paperPanel{position:absolute;left:0;top:0;width:calc(50% + 24px);height:100%;overflow:hidden;z-index:0}
