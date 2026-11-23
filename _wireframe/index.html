@@ -106,7 +106,7 @@
 
   /* ── секция «видео» на бумаге ── */
   .paperSec{position:relative;padding:89px 60px 109px;background:var(--paper);overflow:hidden;z-index:1}
-  .paperSec>.tex{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:135% auto;opacity:.22;mix-blend-mode:multiply;pointer-events:none}
+  .paperSec>.tex{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:cover;background-position:center;opacity:.22;mix-blend-mode:multiply;pointer-events:none}
   .paperSec>.dots{position:absolute;inset:0;opacity:.16;pointer-events:none;
     background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
   .paperSec>*{position:relative}
@@ -191,10 +191,8 @@
     .about p{font-size:13px;line-height:1.55;margin-bottom:9px}
     .tracks{margin-top:21px}
     .tlabel{font-size:15px;margin-bottom:13px}
-    .trow{grid-template-columns:1fr;gap:12px}
-    .track{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;padding:6px 6px 9px}
-    .track b{margin-top:0}
-    .track i{margin-top:2px}
+    .trow{grid-template-columns:repeat(3,1fr);gap:8px}
+    .track{display:block;padding:6px 6px 9px}
     .track{padding:6px 6px 9px}
     .track b{font-size:10px;margin-top:6px;line-height:1.2}
     .track i{font-size:11px;margin-top:2px}
@@ -207,7 +205,7 @@
     .vcard:first-child,.vcard:not(:first-child){grid-column:1;grid-row:auto;display:block;padding:9px 9px 13px;
       color:#EFE9DC;transform:perspective(700px) rotate(var(--rot,0deg));border-bottom:0}
     .vcard:first-child h3{font-size:22px}
-    .vcard:not(:first-child)::before{content:"";position:absolute;inset:0;background:var(--night);filter:url(#torn2);z-index:-1}
+    .vcard:not(:first-child)::before{content:"";position:absolute;display:block;inset:0;background:var(--night);filter:url(#torn2);z-index:-1}
     .vcard:not(:first-child) .foil{display:block}
     .vcard:not(:first-child) .shot{grid-row:auto}
     .vcard:not(:first-child) h3{margin-top:10px;max-width:94%}
