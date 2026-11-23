@@ -800,40 +800,80 @@ balatro(document.getElementById('bg2'));
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const targets=[...document.querySelectorAll('.vcard .shot,.soc,.track,.mark img,.mark svg')];
   for(const el of targets){
+    el.draggable=false;
     el.style.touchAction='none';
-    let st=null;
+    el.style.userSelect='none';
+    el.addEventListener('dragstart',e=>e.preventDefault());
+
+    let st=null, timer=0;
+    const pos={x:0,y:0,vx:0,vy:0}, tgt={x:0,y:0};
+
+    function paint(){
+      /* наклон и растяжение — от СКОРОСТИ, а не от расстояния */
+      const sp=Math.hypot(pos.vx,pos.vy);
+      const rot=Math.max(-7,Math.min(7,pos.vx*0.22));
+      const sx=1+Math.min(.16,sp*0.0022);
+      const sy=1-Math.min(.10,sp*0.0013);
+      el.style.translate=pos.x.toFixed(1)+'px '+pos.y.toFixed(1)+'px';
+      el.style.rotate=rot.toFixed(2)+'deg';
+      el.style.scale=sx.toFixed(3)+' '+sy.toFixed(3);
+    }
+    function tick(){
+      /* инерция: позиция догоняет курсор, скорость плавно гаснет */
+      pos.x += (tgt.x-pos.x)*0.30;
+      pos.y += (tgt.y-pos.y)*0.30;
+      pos.vx *= 0.82; pos.vy *= 0.82;
+      paint();
+      if(!st && Math.hypot(pos.vx,pos.vy)<0.02 && Math.abs(pos.x)<0.05 && Math.abs(pos.y)<0.05){
+        el.style.translate=''; el.style.rotate=''; el.style.scale='';
+        clearInterval(timer); timer=0;
+      }
+    }
+    function run(){ if(!timer) timer=setInterval(tick,16); }
+
     el.addEventListener('pointerdown',e=>{
       if(e.button!==0) return;
-      st={x:e.clientX,y:e.clientY,dx:0,dy:0,moved:false,id:e.pointerId,anim:null};
+      st={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false};
       el.__drag=st;
       if(el.__return){ el.__return.cancel(); el.__return=null; }
+      const cs=getComputedStyle(el);
+      pos.x=parseFloat(el.style.translate?.split(' ')[0])||0;
+      pos.y=parseFloat(el.style.translate?.split(' ')[1])||0;
+      pos.vx=0; pos.vy=0;
+      tgt.x=pos.x; tgt.y=pos.y;
       el.setPointerCapture(e.pointerId);
     });
     el.addEventListener('pointermove',e=>{
       if(!st||e.pointerId!==st.id) return;
-      st.dx=e.clientX-st.x; st.dy=e.clientY-st.y;
-      if(!st.moved&&Math.hypot(st.dx,st.dy)>5){ st.moved=true; el.style.cursor='grabbing'; }
+      const dx=e.clientX-st.x, dy=e.clientY-st.y;
+      if(!st.moved&&Math.hypot(dx,dy)>5){ st.moved=true; el.style.cursor='grabbing'; }
       if(!st.moved) return;
-      const d=Math.hypot(st.dx,st.dy);
-      el.style.translate=`${st.dx.toFixed(1)}px ${st.dy.toFixed(1)}px`;
-      el.style.rotate=`${(st.dx*0.05).toFixed(2)}deg`;
-      el.style.scale=`${(1+d*0.0009).toFixed(3)} ${Math.max(.6,1-d*0.0006).toFixed(3)}`;
+      /* скорость — разница между прошлой и новой целью */
+      pos.vx += (dx-tgt.x)*0.55;
+      pos.vy += (dy-tgt.y)*0.55;
+      tgt.x=dx; tgt.y=dy;
+      run();
     });
     const end=()=>{
       if(!st) return;
-      const {dx,dy,moved}=st;
-      el.__drag=null;
+      const moved=st.moved;
+      st=null; el.__drag=null;
       el.style.cursor='';
-      if(!moved){ st=null; return; }
+      if(!moved){ tgt.x=0; tgt.y=0; run(); return; }
       el.__clickBlock=true;
-      const rot=dx*0.05, d=Math.hypot(dx,dy);
+      /* оттянули и отпустили: возврат с перелётом (back-out) */
+      const fromX=pos.x, fromY=pos.y;
+      const sp=Math.hypot(pos.vx,pos.vy);
+      const fromRot=Math.max(-7,Math.min(7,pos.vx*0.22));
       const a=el.animate([
-        {translate:`${dx}px ${dy}px`,rotate:`${rot}deg`,scale:`${1+d*0.0009} ${Math.max(.6,1-d*0.0006)}`},
+        {translate:fromX.toFixed(1)+'px '+fromY.toFixed(1)+'px',rotate:fromRot.toFixed(2)+'deg',
+         scale:(1+Math.min(.16,sp*0.0022)).toFixed(3)+' '+(1-Math.min(.10,sp*0.0013)).toFixed(3)},
         {translate:'0px 0px',rotate:'0deg',scale:'1 1'}
-      ],{duration:620,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'none'});
+      ],{duration:680,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'none'});
       el.__return=a;
+      clearInterval(timer); timer=0;
+      tgt.x=pos.x; tgt.y=pos.y;
       a.onfinish=()=>{ el.style.translate=''; el.style.rotate=''; el.style.scale=''; el.__return=null; };
-      st=null;
     };
     el.addEventListener('pointerup',end);
     el.addEventListener('pointercancel',end);
@@ -1072,8 +1112,10 @@ balatro(document.getElementById('bg2'));
         if(g.measureText(t).width>r.width&&line){ lines.push(line); line=wd; } else line=t;
       }
       if(line) lines.push(line);
+      const mm=g.measureText('Н');
+      const asc=mm.fontBoundingBoxAscent||fs*0.8, desc=mm.fontBoundingBoxDescent||fs*0.2;
       lines.forEach((ln,i)=>{
-        const yy=r.top-y0+fs*0.8+i*lh;
+        const yy=r.top-y0+(lh-(asc+desc))/2+asc+i*lh;
         g.strokeText(ln,r.left-x0,yy); g.fillText(ln,r.left-x0,yy);
       });
     }
