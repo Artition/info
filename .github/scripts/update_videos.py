@@ -14,8 +14,8 @@ import urllib.request
 
 CHANNEL_ID = "UC9GCAvy2MyxhYoMB2L3Tb4A"
 COUNT = 6
-BASE = os.path.dirname(os.path.abspath(__file__))          # scripts/
-ROOT = os.path.dirname(os.path.dirname(BASE))               # repo root
+HERE = os.path.dirname(os.path.abspath(__file__))   # .../.github/scripts
+ROOT = os.path.dirname(os.path.dirname(HERE))       # repo root (.../.github -> ...)
 PAGE = os.path.join(ROOT, "docs", "index.html")
 THUMBS = os.path.join(ROOT, "docs", "assets", "thumbs")
 RSS = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
