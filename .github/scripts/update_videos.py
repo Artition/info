@@ -51,16 +51,25 @@ def rel_date(pub, today):
 
 
 def fetch_seconds(vid):
-    """Length of a video in seconds, or None if undetectable (fail-open)."""
-    try:
-        req = urllib.request.Request(
-            f"https://www.youtube.com/watch?v={vid}", headers=UA)
-        page = urllib.request.urlopen(req, timeout=30).read().decode(
-            "utf-8", "ignore")
-        m = re.search(r'"lengthSeconds":"(\d+)"', page)
-        return int(m.group(1)) if m else None
-    except Exception:
-        return None
+    """Length of a video in seconds, or None if undetectable.
+
+    Tries the watch page first, then the embed page (less bot-guarded
+    from datacenter IPs). Callers must treat None as "unknown" — never
+    as "long" (fail-closed, otherwise shorts silently slip back in).
+    """
+    urls = (f"https://www.youtube.com/watch?v={vid}",
+            f"https://www.youtube.com/embed/{vid}")
+    for url in urls:
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            page = urllib.request.urlopen(req, timeout=30).read().decode(
+                "utf-8", "ignore")
+            m = re.search(r'"lengthSeconds":"(\d+)"', page)
+            if m:
+                return int(m.group(1))
+        except Exception:
+            continue
+    return None
 
 
 def main():
@@ -77,8 +86,9 @@ def main():
         if len(videos) >= COUNT:
             break
         secs = fetch_seconds(vid)
-        if secs is not None and secs < 60:
-            continue  # shorts out
+        print(f"{vid}: {secs if secs is not None else 'unknown'}s")
+        if secs is None or secs < 60:
+            continue  # shorts — or undetectable (fail-closed, never keep)
         videos.append((vid, html.unescape(title),
                        datetime.datetime.fromisoformat(
                            pub.replace("Z", "+00:00")).date()))
