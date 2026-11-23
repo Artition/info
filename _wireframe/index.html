@@ -8,6 +8,11 @@
 <meta property="og:title" content="Artition — дизайн, монтаж, миры">
 <meta property="og:description" content="Пишу и рисую для Minecraft: контент, обложки, айдентика серверов. Веду канал и снимаю то, что сам хотел бы смотреть.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://artition.github.io/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0C0718">
+<link rel="preload" href="fonts/Unbounded-Black.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="fonts/CHAOS16.otf" as="font" type="font/otf" crossorigin>
 <link rel="icon" href="assets/flame.svg" type="image/svg+xml">
 <style>
   @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900;font-display:block}
@@ -42,7 +47,7 @@
   .plate{position:relative;display:block;overflow:visible;width:100%;max-width:520px;height:auto}
   .plate .nm text{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:138px;letter-spacing:-4.8px;fill:var(--ink)}
 
-  #flame{position:absolute;left:-320px;top:-10px;width:500px;height:1000px;image-rendering:pixelated;z-index:1;
+  #flame{position:absolute;left:-300px;top:-10px;width:480px;height:960px;image-rendering:pixelated;z-index:1;
     transform:rotate(-3deg) scaleX(-1)}
 
   /* ── куб: чёрно-белый дизер ── */
@@ -50,10 +55,13 @@
   .cubeWrap canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 
   .soc-bar{position:relative;z-index:4;display:flex;gap:9px;margin-top:22px}
-  .soc{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--paper);isolation:isolate}
+  .soc{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--paper);isolation:isolate;text-decoration:none}
   .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1}
-  .soc svg{width:17px;height:17px;display:block;position:relative;z-index:2}
-  .soc.vk{font-family:"Chaos16";font-size:15px;position:relative;z-index:2}
+  .soc:nth-child(3n+2)::before{filter:url(#torn2)}
+  .soc:nth-child(3n)::before{filter:url(#torn3)}
+  .soc svg{width:20px;height:20px;display:block;position:relative;z-index:2}
+  .soc.vk{font-family:"Chaos16",monospace;font-size:17px;position:relative;z-index:2}
+  .soc:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
 
   /* ── правая половина: экран ── */
   /* ── правая половина: тексты поверх куба ── */
@@ -64,7 +72,7 @@
   .about .lead{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(24px,3vw,34px);line-height:1.05;text-transform:uppercase;
     letter-spacing:-.01em;margin-bottom:21px}
   .about .lead em{font-style:normal;color:var(--orange)}
-  .about p{font-size:15px;line-height:1.62;max-width:470px;opacity:.86;margin-bottom:13px}
+  .about p{font-size:15px;line-height:1.62;max-width:470px;opacity:.95;margin-bottom:13px}
 
   /* треки — бумажные карточки поверх экрана */
   .tracks{position:relative;z-index:3;margin-top:auto}
@@ -72,12 +80,14 @@
   .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
   .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink)}
   .track::before{content:"";position:absolute;inset:0;background:var(--paper);filter:url(#torn);z-index:-1}
+  .track:nth-child(3n+1)::before{filter:url(#torn)}
+  .track:nth-child(3n+2)::before{filter:url(#torn2)}
+  .track:nth-child(3n)::before{filter:url(#torn3)}
   .cov{position:relative;aspect-ratio:1/1;overflow:hidden;background:#120B24}
   .cov canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
-  .cov .no{position:absolute;left:6px;top:4px;font-family:"Chaos16";font-size:19px;color:var(--paper);
-    text-shadow:0 1px 0 rgba(0,0,0,.35)}
+  .cov .no{display:none}
   .track b{display:block;margin-top:9px;font-size:12.5px;line-height:1.25;font-weight:400}
-  .track i{display:block;margin-top:3px;font-family:"Chaos16";font-style:normal;font-size:15px;color:var(--purple)}
+  .track i{display:block;margin-top:3px;font-family:"Chaos16",monospace;font-style:normal;font-size:15px;color:var(--purple)}
 
   /* ── карточки: 3D-наклон за курсором ── */
   .track,.vcard{transform:perspective(700px) rotate(var(--rot,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--tz,0px));
@@ -89,20 +99,36 @@
     background:linear-gradient(115deg,transparent 26%,rgba(0,255,170,.42) 36%,rgba(255,0,190,.46) 44%,rgba(120,80,255,.42) 52%,rgba(255,180,0,.38) 60%,transparent 70%);
     background-size:200% 200%;background-position:var(--fx,50%) var(--fy,50%);mix-blend-mode:overlay}
   .track:hover .foil,.vcard:hover .foil{opacity:1}
+  @media (hover:none){
+    .track .foil,.vcard .foil{opacity:.55;animation:foil 6s linear infinite alternate}
+    @keyframes foil{to{background-position:100% 100%}}
+  }
 
   /* ── секция «видео» на бумаге ── */
-  .paperSec{position:relative;padding:89px 60px 89px;background:var(--paper);overflow:hidden}
+  .paperSec{position:relative;padding:89px 60px 109px;background:var(--paper);overflow:hidden;z-index:1}
   .paperSec>.tex{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:135% auto;opacity:.22;mix-blend-mode:multiply;pointer-events:none}
   .paperSec>.dots{position:absolute;inset:0;opacity:.16;pointer-events:none;
     background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
   .paperSec>*{position:relative}
   .vhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:55px}
   .vhead h2{font-family:"UnboundedX";font-weight:900;font-size:89px;line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
-  .vnote{font-family:"Chaos16";font-size:21px;color:var(--purple);text-align:right;line-height:1.2}
-  .vnote small{display:block;font-family:"Montserrat";font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:rgba(23,18,16,.5);margin-top:7px}
-  .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .vnote{font-family:"Chaos16",monospace;font-size:21px;color:var(--purple);text-align:right;line-height:1.2}
+  .vnote small{display:block;font-family:"Montserrat",system-ui,sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(23,18,16,.72);margin-top:7px}
+  .vgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:0 34px}
   .vcard{position:relative;isolation:isolate;display:block;padding:9px 9px 13px;color:#EFE9DC;text-decoration:none}
+  .vcard:first-child{grid-column:1/8;grid-row:1/span 5}
+  .vcard:first-child h3{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:28px;line-height:1.1;text-transform:uppercase;letter-spacing:-.01em;min-height:0;max-width:100%}
+  .vcard:not(:first-child){grid-column:8/13;display:grid;grid-template-columns:150px 1fr;gap:0 16px;align-items:center;
+    padding:12px 0;color:var(--ink);transform:none;border-bottom:1px dashed rgba(23,18,16,.35)}
+  .vcard:not(:first-child)::before,.vcard:not(:first-child) .foil{display:none}
+  .vcard:not(:first-child) .shot{grid-row:1/3}
+  .vcard:not(:first-child) h3{min-height:0;margin:0;max-width:100%}
+  .vcard:not(:first-child) .vmeta{color:var(--purple)}
+  .vcard:not(:first-child) .vmeta span{color:rgba(23,18,16,.7)}
+  .vcard:nth-child(3n+1)::before{filter:url(#torn)}
+  .vcard:nth-child(3n+2)::before{filter:url(#torn2)}
+  .vcard:nth-child(3n)::before{filter:url(#torn3)}
   .vcard:nth-child(3n+1){--rot:-.45deg}
   .vcard:nth-child(3n+2){--rot:.35deg}
   .vcard:nth-child(3n){--rot:-.2deg}
@@ -111,17 +137,23 @@
   .shot canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
   .shot .dur{position:absolute;right:7px;bottom:6px;font-family:"Chaos16";font-size:14px;color:var(--paper)}
   .vcard h3{font-size:14.5px;line-height:1.3;font-weight:400;margin-top:10px;max-width:94%;min-height:2.6em}
-  .vmeta{display:flex;justify-content:space-between;align-items:baseline;margin-top:7px;
-    font-family:"Chaos16";font-size:15px;color:var(--orange)}
-  .vmeta span{font-family:"Montserrat";font-size:11px;letter-spacing:.1em;color:rgba(239,233,220,.45)}
+  .vmeta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:7px;
+    font-family:"Chaos16",monospace;font-size:15px;color:var(--orange)}
+  .vmeta b{font-weight:400}
+  .vmeta span{font-family:"Montserrat",system-ui,sans-serif;font-size:11px;letter-spacing:.1em;color:rgba(239,233,220,.7)}
 
   /* ── подвал ── */
   .foot{position:relative;display:grid;grid-template-columns:1fr auto;column-gap:89px;align-items:end;
-    background:var(--night);color:#EFE9DC;padding:89px 60px 34px;overflow:hidden}
+    background:var(--night);color:#EFE9DC;padding:89px 60px 34px;margin-top:-20px;overflow:hidden;z-index:2}
   .foot>.grain{position:absolute;inset:0;opacity:.5;pointer-events:none;
     background:radial-gradient(120% 90% at 78% -10%, rgba(108,59,255,.55) 0%, rgba(12,7,24,0) 62%)}
+  .burn{position:absolute;inset:0 0 0 calc(50% - 10px);z-index:1;pointer-events:none;opacity:0;
+    background:radial-gradient(rgba(12,7,24,.55) 1px,transparent 1.2px) 0 0/4px 4px,var(--orange);
+    animation:ember 1.2s steps(2) infinite alternate}
+  @keyframes ember{to{filter:brightness(.82)}}
+  @media (prefers-reduced-motion:reduce){.burn{animation:none}}
   .foot>*{position:relative}
-  .foot .fh{grid-column:1;font-family:"Chaos16";font-size:21px;color:rgba(239,233,220,.6)}
+  .foot .fh{grid-column:1;font-family:"Chaos16",monospace;font-size:21px;color:rgba(239,233,220,.78)}
   .mail{grid-column:1;display:inline-block;margin:13px 0 0;font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(40px,7vw,89px);
     letter-spacing:-.035em;color:#EFE9DC;text-decoration:none;transition:color .2s}
   .mail em{font-style:normal;color:var(--orange)}
@@ -132,23 +164,25 @@
   .fl a{color:rgba(239,233,220,.72);text-decoration:none;transition:color .2s}
   .fl a:hover{color:var(--orange)}
   .print{grid-column:1 / -1;display:flex;justify-content:space-between;margin-top:89px;font-size:11px;
-    letter-spacing:.1em;text-transform:uppercase;color:rgba(239,233,220,.42);
+    letter-spacing:.1em;text-transform:uppercase;color:rgba(239,233,220,.65);
     border-top:1px solid rgba(239,233,220,.16);padding-top:21px}
 
   :focus-visible{outline:2px solid var(--purple);outline-offset:3px}
   .foot :focus-visible{outline-color:var(--orange)}
+  .vcard:focus-visible,.mail:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
   @media (max-width:900px){    body{width:100%;overflow-x:hidden}
-    .screen{display:block;height:1120px}
-    .paperPanel{width:100%;height:620px}
-    .bgPanel{left:0;top:620px;width:100%;height:500px}
-    .left{position:absolute;left:0;top:0;width:100%;height:620px;padding:28px 22px 24px}
-    .right{position:absolute;left:0;top:620px;width:100%;height:500px;padding:34px 22px 28px}
+    .screen{display:grid;grid-template-columns:1fr;grid-template-areas:"top" "bot";height:auto;min-height:0}
+    .paperPanel{position:relative;grid-area:top;left:auto;top:auto;width:100%;height:auto;min-height:600px;overflow:hidden;z-index:0}
+    .bgPanel{position:relative;grid-area:bot;left:auto;top:auto;width:100%;height:auto;min-height:560px;background:var(--night);overflow:hidden;z-index:0}
+    .left{position:relative;grid-area:top;left:auto;top:auto;width:100%;height:auto;min-height:600px;padding:28px 22px 24px}
+    .right{position:relative;grid-area:bot;left:auto;top:auto;width:100%;height:auto;min-height:560px;padding:34px 22px 28px}
+    .burn{display:none}
     .mark svg{width:22px;height:44px}
     .mark{gap:9px}
     .mark .wm{font-size:10px}
     .plate{width:100%;height:auto}
-    #flame{left:-120px;top:-40px;width:240px;height:400px}
+    #flame{left:-120px;top:-40px;width:240px;height:480px}
     .cubeWrap{display:none}
     .soc-bar{gap:7px;margin-top:16px}
     .soc{width:30px;height:30px}
@@ -157,7 +191,10 @@
     .about p{font-size:13px;line-height:1.55;margin-bottom:9px}
     .tracks{margin-top:21px}
     .tlabel{font-size:15px;margin-bottom:13px}
-    .trow{gap:8px}
+    .trow{grid-template-columns:1fr;gap:12px}
+    .track{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;padding:6px 6px 9px}
+    .track b{margin-top:0}
+    .track i{margin-top:2px}
     .track{padding:6px 6px 9px}
     .track b{font-size:10px;margin-top:6px;line-height:1.2}
     .track i{font-size:11px;margin-top:2px}
@@ -167,6 +204,15 @@
     .vhead h2{font-size:55px}
     .vnote{text-align:left;font-size:15px}
     .vgrid{grid-template-columns:1fr;gap:21px}
+    .vcard:first-child,.vcard:not(:first-child){grid-column:1;grid-row:auto;display:block;padding:9px 9px 13px;
+      color:#EFE9DC;transform:perspective(700px) rotate(var(--rot,0deg));border-bottom:0}
+    .vcard:first-child h3{font-size:22px}
+    .vcard:not(:first-child)::before{content:"";position:absolute;inset:0;background:var(--night);filter:url(#torn2);z-index:-1}
+    .vcard:not(:first-child) .foil{display:block}
+    .vcard:not(:first-child) .shot{grid-row:auto}
+    .vcard:not(:first-child) h3{margin-top:10px;max-width:94%}
+    .vcard:not(:first-child) .vmeta{color:var(--orange)}
+    .vcard:not(:first-child) .vmeta span{color:rgba(239,233,220,.7)}
     .vcard h3{font-size:13.5px;min-height:0}
     .foot{grid-template-columns:1fr;column-gap:0;padding:55px 22px 28px}
     .foot .fh{font-size:15px}
@@ -177,26 +223,37 @@
 </style>
 </head>
 <body>
+<h1 class="sr-only">Artition — дизайн, монтаж, миры</h1>
 
 <svg width="0" height="0" style="position:absolute">
   <filter id="torn" x="-10%" y="-10%" width="120%" height="120%">
     <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="5" result="n"/>
     <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
+  <filter id="torn2" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="17" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="torn3" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="3" seed="42" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
 </svg>
 
 <div class="screen">
   <div class="paperPanel">
     <div class="paperbg"></div><div class="halftone"></div>
-    <canvas id="flame" width="160" height="320"></canvas>
+    <canvas id="flame" width="160" height="320" aria-hidden="true"></canvas>
   </div>
 
   <div class="bgPanel">
-    <canvas id="bg"></canvas>
+    <canvas id="bg" aria-hidden="true"></canvas>
     <div class="veil"></div>
   </div>
 
-  <div class="cubeWrap"><canvas id="cube" width="200" height="200"></canvas></div>
+  <div class="burn" aria-hidden="true"></div>
+
+  <div class="cubeWrap"><canvas id="cube" width="200" height="200" aria-hidden="true"></canvas></div>
 
   <div class="left">
 
@@ -210,25 +267,25 @@
     </div>
 
     <div class="poster">
-      <svg class="plate" viewBox="0 -45 520 285" width="520" height="285" aria-label="Artition">
+      <svg class="plate" viewBox="0 -45 520 285" width="520" height="285" role="img" aria-label="Artition">
         <defs>
           <mask id="cutTag" maskUnits="userSpaceOnUse" x="-60" y="-60" width="640" height="360">
             <rect x="-60" y="-60" width="640" height="360" fill="#fff"/>
-            <g id="maskLetters" fill="#000" stroke="#000" stroke-width="20" stroke-linejoin="round"
-               font-family="Chaos16" font-size="44" xml:space="preserve"></g>
+            <g id="maskLetters" aria-hidden="true" fill="#000" stroke="#000" stroke-width="20" stroke-linejoin="round"
+               font-family="Chaos16, monospace" font-size="44" xml:space="preserve"></g>
           </mask>
         </defs>
         <g class="nm" mask="url(#cutTag)">
           <text x="0" y="105" xml:space="preserve">ARTI</text>
           <text x="0" y="215" xml:space="preserve">TION</text>
         </g>
-        <g id="tagLetters" fill="var(--purple)" font-family="Chaos16" font-size="44" xml:space="preserve"></g>
+        <g id="tagLetters" aria-hidden="true" fill="var(--purple)" font-family="Chaos16, monospace" font-size="44" xml:space="preserve"></g>
       </svg>
       <div class="soc-bar">
-        <div class="soc" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 20H4v-2h16v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12ZM12 9h-2v6h2v2H8V7h4v2Zm3 6h-3v-2h3v2Zm2-2h-2v-2h2v2Zm-2-2h-3V9h3v2Zm5-5H4V4h16v2Z"/></svg></div>
-        <div class="soc" title="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 23H5V21H19V23ZM5 21H3V19H5V21ZM21 21H19V19H21V21ZM3 19H1V5H3V19ZM17 19H15V17H11V15H15V7H12V5H17V19ZM23 19H21V5H23V19ZM13 11V13H11V15H9V17H7V13H9V11H13ZM7 13H4V11H7V13ZM9 11H7V9H9V11ZM12 9H9V7H12V9ZM5 5H3V3H5V5ZM21 5H19V3H21V5ZM19 3H5V1H19V3Z"/></svg></div>
-        <div class="soc vk" title="VK">VK</div>
-        <div class="soc" title="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21H5v-2h4v2Zm10 0h-4v-2h4v2Zm-10-2H5v-2h4v2Zm10 0h-4v-2h4v2ZM5 17H3v-4h2v4Zm16 0h-2v-4h2v4Zm-2-4h-2v-2h2v2ZM7 13H5v-2h2v2Zm10-2h2v2h-2v-2ZM7 11H5V9h2v2Zm12 0h-2V9h2v2ZM9 9H7V7h2v2Zm6 0h-2V7h2v2Zm2-2h-2V5h2v2ZM9 7H7V5h2v2Z"/></svg></div>
+        <a class="soc" href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 20H4v-2h16v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12ZM12 9h-2v6h2v2H8V7h4v2Zm3 6h-3v-2h3v2Zm2-2h-2v-2h2v2Zm-2-2h-3V9h3v2Zm5-5H4V4h16v2Z"/></svg></a>
+        <a class="soc" href="#" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 23H5V21H19V23ZM5 21H3V19H5V21ZM21 21H19V19H21V21ZM3 19H1V5H3V19ZM17 19H15V17H11V15H15V7H12V5H17V19ZM23 19H21V5H23V19ZM13 11V13H11V15H9V17H7V13H9V11H13ZM7 13H4V11H7V13ZM9 11H7V9H9V11ZM12 9H9V7H12V9ZM5 5H3V3H5V5ZM21 5H19V3H21V5ZM19 3H5V1H19V3Z"/></svg></a>
+        <a class="soc vk" href="#" aria-label="VK">VK</a>
+        <a class="soc" href="#" aria-label="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21H5v-2h4v2Zm10 0h-4v-2h4v2Zm-10-2H5v-2h4v2Zm10 0h-4v-2h4v2ZM5 17H3v-4h2v4Zm16 0h-2v-4h2v4Zm-2-4h-2v-2h2v2ZM7 13H5v-2h2v2Zm10-2h2v2h-2v-2ZM7 11H5V9h2v2Zm12 0h-2V9h2v2ZM9 9H7V7h2v2Zm6 0h-2V7h2v2Zm2-2h-2V5h2v2ZM9 7H7V5h2v2Z"/></svg></a>
       </div>
     </div>
   </div>
@@ -359,10 +416,20 @@ function drawFlame(){
   }
   ctx.putImageData(img,0,0);
 }
-drawFlame(); setInterval(()=>{ fseed=(fseed%50)+1; drawFlame(); },190);
+drawFlame();
+const RMF=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let inViewF=true;
+if('IntersectionObserver' in window&&document.querySelector('.screen'))
+  new IntersectionObserver(([e])=>inViewF=e.isIntersecting).observe(document.querySelector('.screen'));
+if(!RMF) setInterval(()=>{ if(!inViewF||document.hidden) return; fseed=(fseed%50)+1; drawFlame(); },190);
 
 /* ── обложки треков (заглушки) ── */
+function sizeCanvas(cvs,ratio){
+  const w=Math.max(12,Math.round(cvs.clientWidth/3)), h=Math.max(12,Math.round(w/(ratio||1)));
+  if(cvs.width!==w||cvs.height!==h){ cvs.width=w; cvs.height=h; }
+}
 function ditherCanvas(cvs,{cell=2,levels=3,stops,field}){
+  cvs.setAttribute('aria-hidden','true');
   const W=cvs.width,H=cvs.height,ctx=cvs.getContext('2d'),img=ctx.createImageData(W,H),d=img.data;
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     let v=Math.min(1,Math.max(0,field(x/W,y/H)));
@@ -374,6 +441,7 @@ function ditherCanvas(cvs,{cell=2,levels=3,stops,field}){
   }
   ctx.putImageData(img,0,0);
 }
+function drawTracks(){
 ditherCanvas(document.getElementById('t1'),{cell:3,levels:3,
   stops:[[0,[10,6,20]],[.5,[90,50,220]],[.85,[255,106,26]],[1,[255,180,90]]],
   field:(u,v)=>Math.min(1,Math.max(0,.95-.95*Math.hypot(u-.44,v-.42)))});
@@ -383,7 +451,16 @@ ditherCanvas(document.getElementById('t2'),{cell:3,levels:2,
 ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
   stops:[[0,[8,5,18]],[.55,[70,32,150]],[1,[255,140,60]]],
   field:(u,v)=>Math.min(1,Math.max(0,.9-.75*Math.hypot(u-.32,v-.68)+.22*Math.sin(u*9)))});
-
+}
+['t1','t2','t3'].forEach(id=>{ const c=document.getElementById(id); if(c) sizeCanvas(c,1); });
+drawTracks();
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
+  let rs=false;
+  ['t1','t2','t3'].forEach(id=>{ const c=document.getElementById(id); if(!c) return;
+    const w=Math.max(12,Math.round(c.clientWidth/3));
+    if(c.width!==w){ c.width=w; c.height=w; rs=true; } });
+  if(rs) drawTracks();
+});
 /* ── рваная кромка стыка: одинаковый профиль на обеих половинах ── */
 (function(){
   const L=document.querySelector('.paperPanel'), R=document.querySelector('.bgPanel');
@@ -406,8 +483,16 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
     }else{
       const W=R.offsetWidth||720,H=R.offsetHeight||1000,step=9,amp=13,pts=[];
       for(let y=0;y<=H;y+=step){ const t=y/step; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
-      R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),`${W}px 100%`,`${W}px 0`].join(',')})`;
+      const bot=[];
+      for(let x=0;x<=W;x+=step){ const t2=x/step; const n2=vn(t2+61)*.65+vn(t2*3.1+17)*.35; bot.push(`${(x-n2*amp).toFixed(1)}px ${H}px`); }
+      R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),...bot,`${W}px 0`].join(',')})`;
       L.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${(W+x).toFixed(1)}px ${y}px`),'0 100%'].join(',')})`;
+      const B=document.querySelector('.burn');
+      if(B){
+        const bp=pts.map(([y,x])=>`${(x+10-3-7*vn(y/step*2.3+5)).toFixed(1)}px ${y}px`);
+        B.style.clipPath=`polygon(${[...bp,`${W+10}px 100%`,`${W+10}px 0`].join(',')})`;
+        B.style.opacity='1';
+      }
     }
   }
   draw();
@@ -417,7 +502,13 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
 /* ── фон правой половины: шейдер в духе Balatro (Azkun/balatroShader, MIT-подобный) ── */
 (function(){
   const cvs=document.getElementById('bg');
-  cvs.width=720; cvs.height=1000;
+  function sizeBg(){
+    const r=cvs.getBoundingClientRect();
+    const w=Math.max(2,Math.round(r.width)), h=Math.max(2,Math.round(r.height));
+    if(cvs.width!==w||cvs.height!==h){ cvs.width=w; cvs.height=h; }
+  }
+  sizeBg();
+  addEventListener('resize',()=>{ clearTimeout(window.__bg); window.__bg=setTimeout(sizeBg,150); });
   const gl=cvs.getContext('webgl',{antialias:false,alpha:false});
   if(!gl) return;
   const vs=`attribute vec4 a_position; void main(){ gl_Position=a_position; }`;
@@ -426,6 +517,8 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
     uniform float time, spin_time, contrast, spin_amount, pixel_fac, spin_ease, zoom;
     uniform vec2 offset, resolution;
     uniform vec4 colour_1, colour_2, colour_3;
+    float bayer2(vec2 a){a=floor(a);return fract(a.x/2.+a.y*a.y*.75);}
+    #define bayer4(a) (bayer2(.5*(a))*.25+bayer2(a))
     void main(){
       vec2 sc=gl_FragCoord.xy;
       float pixel_size=length(resolution.xy)/pixel_fac;
@@ -449,6 +542,7 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
       float c2p=max(0.0,1.0-cmod*abs(paint));
       float c3p=1.0-min(1.0,c1p+c2p);
       vec4 ret=(0.3/contrast)*colour_1+(1.0-0.3/contrast)*(colour_1*c1p+colour_2*c2p+vec4(c3p*colour_3.rgb,c3p*colour_1.a));
+      ret.rgb=floor(ret.rgb*4.0+bayer4(gl_FragCoord.xy/3.0))/4.0;
       gl_FragColor=ret;
     }`;
   function sh(t,src){ const s=gl.createShader(t); gl.shaderSource(s,src); gl.compileShader(s); return s; }
@@ -798,7 +892,15 @@ ditherCanvas(document.getElementById('t3'),{cell:3,levels:3,
   ];
   specs.forEach(([id,stops,field])=>{
     const c=document.getElementById(id);
-    if(c) ditherCanvas(c,{cell:3,levels:3,stops,field});
+    if(c){ sizeCanvas(c,16/9); ditherCanvas(c,{cell:3,levels:3,stops,field}); }
+  });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
+    let rs=false;
+    specs.forEach(([id])=>{ const c=document.getElementById(id); if(!c) return;
+      const w=Math.max(12,Math.round(c.clientWidth/3)), h=Math.max(12,Math.round(w/(16/9)));
+      if(c.width!==w||c.height!==h){ c.width=w; c.height=h; rs=true; } });
+    if(rs) specs.forEach(([id,stops,field])=>{ const c=document.getElementById(id);
+      if(c) ditherCanvas(c,{cell:3,levels:3,stops,field}); });
   });
 })();
 
