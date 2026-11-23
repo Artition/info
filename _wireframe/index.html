@@ -236,13 +236,13 @@
     .vhead{flex-direction:column;align-items:flex-start;gap:21px;margin-bottom:34px}
     .vhead h2{font-size:55px}
     .vnote{text-align:left;font-size:15px}
-    .vgrid{grid-template-columns:1fr;gap:21px}
+    .vgrid{grid-template-columns:1fr;gap:21px;grid-auto-rows:auto}
     .vcard:first-child,.vcard:not(:first-child){grid-column:1;grid-row:auto;display:block;padding:9px 9px 13px;
       color:#EFE9DC;transform:perspective(700px) rotate(var(--rot,0deg));border-bottom:0}
     .vcard:first-child h3{font-size:22px}
     .vcard:not(:first-child)::before{content:"";position:absolute;display:block;inset:0;background:var(--night);filter:url(#torn2);z-index:-1}
     .vcard:not(:first-child) .foil{display:block}
-    .vcard:not(:first-child) .shot{grid-row:auto}
+    .vcard:not(:first-child) .shot{grid-row:auto;height:auto;aspect-ratio:16/9;align-self:auto}
     .vcard:not(:first-child) h3{margin-top:10px;max-width:94%}
     .vcard:not(:first-child) .vmeta{color:var(--orange)}
     .vcard:not(:first-child) .vmeta span{color:rgba(239,233,220,.7)}
@@ -330,8 +330,8 @@
 
   <div class="right">
     <div class="about">
-      <div class="lead">делаю <em>всё</em><br>по-немножку</div>
-      <p>Я — ютубер, дизайнер, художник, аниматор, монтажёр, а так же веду наш сервер ТОМ</p>
+      <div class="lead">делаю <em>всё</em><br>понемножку</div>
+      <p>Я — ютубер, дизайнер, художник, аниматор, монтажёр, а также веду наш сервер ТОМ</p>
       <p>Здесь вы сможете найти все, связанное со мной</p>
     </div>
 
