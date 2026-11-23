@@ -782,42 +782,32 @@ balatro(document.getElementById('bg2'));
 </script>
 
 <script>
-/* ── глитч-дёрганье раз в секунду: треки, иконки, видео — резко, без интерполяции ── */
-(function(){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const els=[...document.querySelectorAll('.track,.soc,.vcard')];
-  setInterval(()=>{
-    if(document.hidden) return;
-    for(const el of els){
-      if(el.__drag) continue;
-      el.style.translate=`${((Math.random()-.5)*2.4).toFixed(1)}px ${((Math.random()-.5)*2.4).toFixed(1)}px`;
-      el.style.rotate=`${((Math.random()-.5)*1.2).toFixed(2)}deg`;
-    }
-  },1000);
-})();
-
-document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.soc')) e.preventDefault(); },true);
-
-/* ── перетаскивание с настоящей физикой: карты, иконки, треки, логотип ── */
+/* ── перетаскивание по оригинальному скрипту Balatro (godotshaders.com/shader/balatro-card-hover):
+       позиция = lerp(позиция, курсор, 0.25)
+       поворот НАКАПЛИВАЕТСЯ: rotation += clamp(velocity/4000, -.3, .3); rotation *= 0.8
+       в покое карта ловит скорость возврата и покачивается синусом ── */
 (function(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   function bind(el,o){
     o=o||{};
-    const spin=o.spin??0.45, lift=o.lift??1.05, tiltK=o.tilt??0, escape=!!o.escape;
+    const lift=o.lift??1.05, tiltK=o.tilt??0, escape=!!o.escape;
+    const phase=Math.random()*6.28;
+    const sec=escape?el.closest('.paperSec'):null;
+
     el.draggable=false;
     el.style.touchAction='pan-y';
     el.addEventListener('dragstart',e=>e.preventDefault());
-    const sec=escape?el.closest('.paperSec'):null;
-    let st=null, timer=0, lastT=0;
-    const s={x:0,y:0,vx:0,vy:0,rot:0,vrot:0,tx:0,ty:0};
+
+    let st=null, timer=0, lastT=0, lastMoveT=0;
+    const s={x:0,y:0,rot:0,vx:0,vy:0,prevX:0,prevY:0,offX:0,offY:0};
 
     function paint(){
       el.style.translate=s.x.toFixed(1)+'px '+s.y.toFixed(1)+'px';
       el.style.rotate=s.rot.toFixed(2)+'deg';
       if(tiltK){
-        el.style.setProperty('--rx',Math.max(-22,Math.min(22,s.tx)).toFixed(2)+'deg');
-        el.style.setProperty('--ry',Math.max(-22,Math.min(22,s.ty)).toFixed(2)+'deg');
+        el.style.setProperty('--rx',Math.max(-16,Math.min(16,-s.offY*tiltK)).toFixed(2)+'deg');
+        el.style.setProperty('--ry',Math.max(-16,Math.min(16, s.offX*tiltK)).toFixed(2)+'deg');
       }
     }
     function stop(){
@@ -825,70 +815,71 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
       if(tiltK){ el.style.setProperty('--rx','0deg'); el.style.setProperty('--ry','0deg'); }
       el.style.zIndex='';
       if(sec&&sec.__ovf){ sec.style.overflow=''; sec.__ovf=false; }
-      clearInterval(timer); timer=0; lastT=0;
+      clearInterval(timer); timer=0;
     }
     function tick(){
-      if(st) return;
       const now=performance.now();
-      const dt=Math.min(3,Math.max(.4,(now-(lastT||now))/16.67)); lastT=now;
-      /* угловая инерция: докручивается и тормозит трением */
-      s.rot+=s.vrot*dt;
-      s.vrot*=Math.pow(0.94,dt);
-      /* когда докрут почти кончился — пружина ведёт карту в исходный угол */
-      if(Math.abs(s.vrot)<2) s.vrot+=-s.rot*0.05*dt;
-      s.x+=s.vx*dt; s.y+=s.vy*dt;
-      s.vx*=Math.pow(0.86,dt); s.vy*=Math.pow(0.86,dt);
-      s.x+=-s.x*0.15*dt; s.y+=-s.y*0.15*dt;
-      s.tx+=-s.tx*0.15*dt; s.ty+=-s.ty*0.15*dt;
+      const dt=Math.min(2.5,Math.max(.5,(now-(lastT||now))/16.67)); lastT=now;
+      const k=1-Math.pow(1-0.25,dt);
+
+      if(st){
+        s.x+=(st.tx-s.x)*k;
+        s.y+=(st.ty-s.y)*k;
+        if(now-lastMoveT>90){ s.vx*=0.6; s.vy*=0.6; }
+        s.rot+=Math.max(-0.3,Math.min(0.3,s.vx/4000))*57.3*dt;
+        s.rot*=Math.pow(0.80,dt);
+      }else{
+        s.x+=(0-s.x)*k;
+        s.y+=(0-s.y)*k;
+        const rvx=(s.x-s.prevX);
+        s.rot+=Math.max(-0.3,Math.min(0.25,rvx*0.01532))*57.3;
+        s.rot*=Math.pow(0.80,dt);
+        s.rot+=Math.sin(now/1000+phase)*0.10;
+        s.offX*=0.9; s.offY*=0.9;
+      }
+      s.prevX=s.x; s.prevY=s.y;
       paint();
-      /* докрут не должен длиться вечно: через 2.2 с мягко доводим в покой */
-      if(s.rel&&now-s.rel>2200){ finalize(); return; }
-      if(Math.abs(s.rot)<0.25&&Math.abs(s.vrot)<0.3&&Math.abs(s.x)<0.8&&Math.abs(s.y)<0.8
-        &&Math.abs(s.tx)<0.2&&Math.abs(s.ty)<0.2) stop();
+      if(!st&&Math.abs(s.rot)<2&&Math.abs(s.x)<0.6&&Math.abs(s.y)<0.6&&Math.abs(s.offX)<0.6&&Math.abs(s.offY)<0.6){
+        stop();
+      }
     }
-    function finalize(){
-      clearInterval(timer); timer=0;
-      const from={translate:s.x.toFixed(1)+'px '+s.y.toFixed(1)+'px',rotate:s.rot.toFixed(2)+'deg'};
-      if(tiltK){ from.rotateX=s.tx.toFixed(2)+'deg'; from.rotateY=s.ty.toFixed(2)+'deg'; }
-      const anim=el.animate([from,{translate:'0px 0px',rotate:'0deg'}],
-        {duration:560,easing:'cubic-bezier(.34,1.56,.64,1)'});
-      anim.onfinish=()=>{ stop(); };
-    }
-    function run(){ if(!timer){ lastT=0; s.rel=0; timer=setInterval(tick,16); } }
+    function run(){ if(!timer){ lastT=0; timer=setInterval(tick,16); } }
 
     el.addEventListener('pointerdown',e=>{
       if(e.button!==0||e.pointerType==='touch') return;
-      st={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,vx:0,vy:0};
-      el.__drag=st;
+      const r=el.getBoundingClientRect(), m=10;
+      st={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,tx:s.x,ty:s.y,
+          cx:r.left+r.width/2, cy:r.top+r.height/2,
+          bounds:{minX:m-r.left,maxX:innerWidth-r.right-m,minY:m-r.top,maxY:innerHeight-r.bottom-m}, ox:e.clientX-(r.left+r.width/2), oy:e.clientY-(r.top+r.height/2)};
+      el.__drag=st; el.__phys=true;
       el.style.zIndex='40';
       el.style.scale=lift+' '+lift;
       if(sec&&getComputedStyle(sec).overflow!=='visible'){ sec.style.overflow='visible'; sec.__ovf=true; }
-      el.setPointerCapture(e.pointerId);
-      paint();
+      try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      s.vx=0; s.vy=0; lastT=0; run();
     });
     el.addEventListener('pointermove',e=>{
       if(!st||e.pointerId!==st.id) return;
       const dx=e.clientX-st.x, dy=e.clientY-st.y;
       if(!st.moved&&Math.hypot(dx,dy)>4){ st.moved=true; el.style.cursor='grabbing'; }
-      if(!st.moved) return;
       st.x=e.clientX; st.y=e.clientY;
-      s.x+=dx; s.y+=dy;
-      /* докрут от движения руки: круговой жест накручивает обороты без предела */
-      s.rot+=dx*spin;
-      /* мгновенная угловая скорость — её карта и уносит с собой на отпускании */
-      s.vrot=dx*spin*0.85+(s.vrot||0)*0.15;
-      s.vx=dx*0.9; s.vy=dy*0.9;
-      s.ty=s.x*tiltK; s.tx=-s.y*tiltK;
-      paint();
+      const now=performance.now(), dts=Math.max(8,now-lastMoveT);
+      s.vx=s.vx*0.5+(dx*1000/dts)*0.5;
+      s.vy=s.vy*0.5+(dy*1000/dts)*0.5;
+      lastMoveT=now;
+      s.offX=e.clientX-st.cx; s.offY=e.clientY-st.cy;
+      st.tx=Math.max(st.bounds.minX,Math.min(st.bounds.maxX,s.x+dx));
+      st.ty=Math.max(st.bounds.minY,Math.min(st.bounds.maxY,s.y+dy));
+      run();
     });
     const end=()=>{
       if(!st) return;
       const moved=st.moved;
-      st=null; el.__drag=null;
+      st=null; el.__drag=null; el.__phys=false;
       el.style.cursor='';
       if(moved) el.__clickBlock=true;
+      lastMoveT=0;
       run();
-      s.rel=performance.now();
     };
     el.addEventListener('pointerup',end);
     el.addEventListener('pointercancel',end);
@@ -897,10 +888,8 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
     },true);
   }
 
-  /* карты видео: тянутся, крутятся, выезжают за границы секции */
-  document.querySelectorAll('.vcard').forEach(el=>bind(el,{spin:0.42,lift:1.05,tilt:0.10,escape:true}));
-  /* всё остальное: соцсети, треки, логотип */
-  document.querySelectorAll('.soc,.track,.mark img,.mark svg').forEach(el=>bind(el,{spin:0.55,lift:1.06}));
+  document.querySelectorAll('.vcard').forEach(el=>bind(el,{tilt:0.18,lift:1.05,escape:true}));
+  document.querySelectorAll('.soc,.track,.mark img,.mark svg').forEach(el=>bind(el,{lift:1.06}));
 })();
 </script>
 
