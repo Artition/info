@@ -86,7 +86,6 @@
   .tlabel{font-family:"Chaos16",monospace;font-size:21px;letter-spacing:.02em;color:var(--orange);text-align:right;margin-bottom:21px}
   .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
   .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink);display:block;text-decoration:none}
-  #tagLetters text{paint-order:stroke fill;stroke:#E9E3D5;stroke-width:10px;stroke-linejoin:round}
   .track::before{content:"";position:absolute;inset:0;background:var(--paper);filter:url(#torn);z-index:-1}
   .track:nth-child(3n+1)::before{filter:url(#torn)}
   .track:nth-child(3n+2)::before{filter:url(#torn2)}
@@ -445,10 +444,29 @@ for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
 let fseed=1;
 function drawFlame(){
   const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
+  /* дырка в пламени по форме подзаголовка с обводкой (та же ширина 20, что в маске cutTag) */
+  const fr=fc.getBoundingClientRect(), holes=[];
+  if(fr.width>0){
+    const plate=document.querySelector('.plate');
+    const pad=plate?20*plate.getBoundingClientRect().width/520:24;
+    const ts=document.querySelectorAll('#tagLetters text');
+    for(const t of ts){
+      const r=t.getBoundingClientRect();
+      if(r.width===0&&r.height===0) continue;
+      const ax=(1-(r.right+pad-fr.left)/fr.width)*FW, bx=(1-(r.left-pad-fr.left)/fr.width)*FW;
+      const ay=(r.top-pad-fr.top)/fr.height*FH, by=(r.bottom+pad-fr.top)/fr.height*FH;
+      holes.push([Math.min(ax,bx),Math.min(ay,by),Math.max(ax,bx),Math.max(ay,by)]);
+    }
+  }
   const PIX=2; /* размер пикселя дизера */
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
     const px=(x/PIX)|0, py=(y/PIX)|0;
-    const i=y*FW+x, n=fbm(px*0.09,py*0.09,fseed);
+    const i=y*FW+x, cx=x+0.5, cy=y+0.5;
+    let cut=false;
+    for(let k=0;k<holes.length;k++){ const h=holes[k];
+      if(cx>=h[0]&&cx<=h[2]&&cy>=h[1]&&cy<=h[3]){ cut=true; break; } }
+    if(cut){ d[i*4+3]=0; continue; }
+    const n=fbm(px*0.09,py*0.09,fseed);
     const er=Math.max(0,(28-x)/28);
     const thr=0.30+(n-0.5)*0.62+er*(0.10+0.22*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
     if(soft[i] <= thr){ d[i*4+3]=0; continue; }
