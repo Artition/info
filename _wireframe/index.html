@@ -765,7 +765,8 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
         nv=[nv[0]/nl,nv[1]/nl,nv[2]/nl];
         /* отсечение задних граней: смотрим из камеры на центр грани */
         if(nv[0]*(-ctr3[0])+nv[1]*(-ctr3[1])+nv[2]*(4.2-ctr3[2])<=0) continue;
-        const tone=shade(nv[0]*lx+nv[1]*ly+nv[2]*lz)*c.tint;
+        const tw=1+(c.tint-1)*Math.min(1,(spread-BASE_T)/0.15);
+        const tone=shade(nv[0]*lx+nv[1]*ly+nv[2]*lz)*tw;
         list.push({pts,dp,z:zs/f.poly.length,tone,inn:f.inn});
       }
     }
@@ -801,7 +802,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
     }
 
     /* чёрная обводка граней — держит форму и прячет щели между кусками */
-    const edgeA=Math.max(0,Math.min(1,(spread-0.12)*3));
+    const edgeA=Math.max(0,Math.min(1,(spread-BASE_T)*3));
     function edge(pts, dp, th, force){
       if(!force && edgeA<0.02) return;
       th=th||1;
@@ -857,7 +858,6 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
     /* куски: включаются только когда подложка ушла, иначе двоение */
     for(const g of list){
       if(spread<BASE_T) break;
-      if(g.inn && spread<0.14) continue;
       raster(g.pts, g.dp, g.inn ? g.tone*(0.55+0.32*spread) : g.tone);
       edge(g.pts, g.dp);
     }
