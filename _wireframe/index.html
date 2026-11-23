@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Artition — дизайн, монтаж, миры</title>
-<meta name="description" content="Artition: рисую и монтирую для Minecraft — контент, обложки, айдентика серверов. Канал M_0_O_n и последние видео.">
-<meta property="og:title" content="Artition — дизайн, монтаж, миры">
-<meta property="og:description" content="Пишу и рисую для Minecraft: контент, обложки, айдентика серверов. Веду канал и снимаю то, что сам хотел бы смотреть.">
+<title>Artition — дизайн, арты, видео</title>
+<meta name="description" content="Artition: ютубер, дизайнер, художник, аниматор и монтажёр. Веду сервер ТОМ. Здесь всё связанное со мной: видео и ссылки.">
+<meta property="og:title" content="Artition — дизайн, арты, видео">
+<meta property="og:description" content="Ютубер, дизайнер, художник, аниматор, монтажёр. Веду сервер ТОМ.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://artition.github.io/">
 <meta name="twitter:card" content="summary_large_image">
@@ -16,11 +16,10 @@
 <link rel="icon" href="assets/flame.svg" type="image/svg+xml">
 <style>
   @font-face{font-family:"UnboundedX";src:url("fonts/Unbounded-Black.ttf");font-weight:900;font-display:block}
-  @font-face{font-family:"Montserrat";src:url("fonts/Montserrat-Regular.otf");font-weight:400;font-display:swap}
   @font-face{font-family:"Chaos16";src:url("fonts/CHAOS16.otf");font-display:block}
   :root{--paper:#E9E3D5;--ink:#171210;--purple:#6C3BFF;--orange:#FF6A1A;--night:#0C0718}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{width:100%;background:var(--paper);color:var(--ink);font-family:"Montserrat",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{width:100%;background:var(--paper);color:var(--ink);font-family:"Chaos16",monospace;-webkit-font-smoothing:antialiased}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
   .screen{position:relative;display:grid;grid-template-columns:1fr 1fr;height:auto;min-height:100svh;max-height:none;overflow:hidden;
@@ -58,12 +57,12 @@
   .cubeWrap canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 
   .soc-bar{position:relative;z-index:4;display:flex;gap:9px;margin-top:22px}
-  .soc{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--paper);isolation:isolate;text-decoration:none}
-  .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1}
-  .soc:nth-child(3n+2)::before{filter:url(#torn2)}
-  .soc:nth-child(3n)::before{filter:url(#torn3)}
-  .soc svg{width:20px;height:20px;display:block;position:relative;z-index:2}
-  .soc.vk{font-family:"Chaos16",monospace;font-size:17px;position:relative;z-index:2}
+  .soc{position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;isolation:isolate;text-decoration:none;transition:transform .18s ease-out}
+  .soc:hover{transform:translateY(-5px) rotate(-5deg)}
+  .soc:active{transform:translateY(-1px) rotate(-2deg)}
+  .soc::before{content:"";position:absolute;inset:0;background:var(--ink);filter:url(#torn);z-index:-1;transition:transform .18s ease-out}
+  .soc:hover::before{background:var(--purple)}
+  .soc img{width:40px;height:40px;display:block;position:relative;z-index:2;image-rendering:pixelated}
   .soc:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
 
   /* ── правая половина: экран ── */
@@ -75,11 +74,11 @@
   .about .lead{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(24px,3vw,34px);line-height:1.05;text-transform:uppercase;
     letter-spacing:-.01em;margin-bottom:21px}
   .about .lead em{font-style:normal;color:var(--orange)}
-  .about p{font-size:15px;line-height:1.62;max-width:470px;opacity:.95;margin-bottom:13px}
+  .about p{font-size:20px;line-height:1.5;max-width:470px;opacity:.95;margin-bottom:13px}
 
   /* треки — бумажные карточки поверх экрана */
   .tracks{position:relative;z-index:3;margin-top:auto}
-  .tlabel{font-family:"Chaos16";font-size:21px;letter-spacing:.02em;opacity:.8;margin-bottom:21px}
+  .tlabel{font-family:"Chaos16",monospace;font-size:21px;letter-spacing:.02em;color:var(--orange);text-align:right;margin-bottom:21px}
   .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:19px}
   .track{position:relative;isolation:isolate;padding:9px 9px 14px;color:var(--ink)}
   .track::before{content:"";position:absolute;inset:0;background:var(--paper);filter:url(#torn);z-index:-1}
@@ -89,8 +88,8 @@
   .cov{position:relative;aspect-ratio:1/1;overflow:hidden;background:#120B24}
   .cov canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
   .cov .no{display:none}
-  .track b{display:block;margin-top:9px;font-size:12.5px;line-height:1.25;font-weight:400}
-  .track i{display:block;margin-top:3px;font-family:"Chaos16",monospace;font-style:normal;font-size:15px;color:var(--purple)}
+  .track b{display:block;margin-top:9px;font-size:18px;line-height:1.2;font-weight:400}
+  .track i{display:block;margin-top:3px;font-family:"Chaos16",monospace;font-style:normal;font-size:17px;color:var(--purple)}
 
   /* ── карточки: 3D-наклон за курсором ── */
   .track,.vcard{transform:perspective(700px) rotate(var(--rot,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--tz,0px));
@@ -116,8 +115,6 @@
   .vhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:55px}
   .vhead h2{font-family:"UnboundedX";font-weight:900;font-size:89px;line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
   .vnote{font-family:"Chaos16",monospace;font-size:21px;color:var(--purple);text-align:right;line-height:1.2}
-  .vnote small{display:block;font-family:"Montserrat",system-ui,sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:rgba(23,18,16,.72);margin-top:7px}
   .vgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:0 34px}
   .vcard{position:relative;isolation:isolate;display:block;padding:9px 9px 13px;color:#EFE9DC;text-decoration:none}
   .vcard:first-child{grid-column:1/8;grid-row:1/span 5}
@@ -143,7 +140,7 @@
   .vmeta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:7px;
     font-family:"Chaos16",monospace;font-size:15px;color:var(--orange)}
   .vmeta b{font-weight:400}
-  .vmeta span{font-family:"Montserrat",system-ui,sans-serif;font-size:11px;letter-spacing:.1em;color:rgba(239,233,220,.7)}
+  .vmeta span{font-family:"Chaos16",monospace;font-size:15px;letter-spacing:.02em;color:rgba(239,233,220,.7)}
 
   /* ── подвал ── */
   .foot{position:relative;display:grid;grid-template-columns:1fr auto;column-gap:89px;align-items:end;
@@ -191,13 +188,13 @@
     .soc{width:30px;height:30px}
     .about{margin-top:0}
     .about .lead{font-size:24px;margin-bottom:13px}
-    .about p{font-size:13px;line-height:1.55;margin-bottom:9px}
+    .about p{font-size:17px;line-height:1.5;margin-bottom:9px}
     .tracks{margin-top:21px}
     .tlabel{font-size:15px;margin-bottom:13px}
     .trow{grid-template-columns:repeat(3,1fr);gap:8px}
     .track{display:block;padding:6px 6px 9px}
     .track{padding:6px 6px 9px}
-    .track b{font-size:10px;margin-top:6px;line-height:1.2}
+    .track b{font-size:15px;margin-top:6px;line-height:1.2}
     .track i{font-size:11px;margin-top:2px}
     .cov .no{font-size:13px;left:4px;top:2px}
     .paperSec{padding:55px 22px}
@@ -224,7 +221,7 @@
 </style>
 </head>
 <body>
-<h1 class="sr-only">Artition — дизайн, монтаж, миры</h1>
+<h1 class="sr-only">Artition — дизайн, арты, видео</h1>
 
 <svg width="0" height="0" style="position:absolute">
   <filter id="torn" x="-10%" y="-10%" width="120%" height="120%">
@@ -283,37 +280,36 @@
         <g id="tagLetters" aria-hidden="true" fill="var(--purple)" font-family="Chaos16, monospace" font-size="44" xml:space="preserve"></g>
       </svg>
       <div class="soc-bar">
-        <a class="soc" href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 20H4v-2h16v2ZM4 18H2V6h2v12Zm18 0h-2V6h2v12ZM12 9h-2v6h2v2H8V7h4v2Zm3 6h-3v-2h3v2Zm2-2h-2v-2h2v2Zm-2-2h-3V9h3v2Zm5-5H4V4h16v2Z"/></svg></a>
-        <a class="soc" href="#" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 23H5V21H19V23ZM5 21H3V19H5V21ZM21 21H19V19H21V21ZM3 19H1V5H3V19ZM17 19H15V17H11V15H15V7H12V5H17V19ZM23 19H21V5H23V19ZM13 11V13H11V15H9V17H7V13H9V11H13ZM7 13H4V11H7V13ZM9 11H7V9H9V11ZM12 9H9V7H12V9ZM5 5H3V3H5V5ZM21 5H19V3H21V5ZM19 3H5V1H19V3Z"/></svg></a>
-        <a class="soc vk" href="#" aria-label="VK">VK</a>
-        <a class="soc" href="#" aria-label="Discord"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21H5v-2h4v2Zm10 0h-4v-2h4v2Zm-10-2H5v-2h4v2Zm10 0h-4v-2h4v2ZM5 17H3v-4h2v4Zm16 0h-2v-4h2v4Zm-2-4h-2v-2h2v2ZM7 13H5v-2h2v2Zm10-2h2v2h-2v-2ZM7 11H5V9h2v2Zm12 0h-2V9h2v2ZM9 9H7V7h2v2Zm6 0h-2V7h2v2Zm2-2h-2V5h2v2ZM9 7H7V5h2v2Z"/></svg></a>
+        <a class="soc" href="https://www.youtube.com/@artition1" aria-label="YouTube"><img src="assets/icons/youtube.png" alt="" width="40" height="40"></a>
+        <a class="soc" href="https://t.me/ArtitionStar" aria-label="Telegram"><img src="assets/icons/telegram.png" alt="" width="40" height="40"></a>
+        <a class="soc" href="https://www.tiktok.com/@artition" aria-label="TikTok"><img src="assets/icons/tiktok.png" alt="" width="40" height="40"></a>
       </div>
     </div>
   </div>
 
   <div class="right">
     <div class="about">
-      <div class="lead">делаю <em>картинки</em>,<br>миры и видео</div>
-      <p>Пишу и рисую для Minecraft: контент, обложки, айдентика серверов. Веду канал и снимаю то, что сам хотел бы смотреть.</p>
-      <p>Тут — всё, что я делаю, ссылки и последние видео.</p>
+      <div class="lead">делаю <em>всё</em><br>по-немножку</div>
+      <p>Я — ютубер, дизайнер, художник, аниматор, монтажёр, а так же веду наш сервер ТОМ</p>
+      <p>Здесь вы сможете найти все, связанное со мной</p>
     </div>
 
     <div class="tracks">
-      <div class="tlabel">под это всё делалось</div>
+      <div class="tlabel">мои любимые треки</div>
       <div class="trow">
         <div class="track">
           <div class="cov"><canvas id="t1" width="120" height="120"></canvas><div class="no">01</div></div>
-          <b>Название трека</b><i>автор</i>
+          <b>Рисунки</b><i>nyan.mp3</i>
           <div class="foil"></div>
         </div>
         <div class="track">
           <div class="cov"><canvas id="t2" width="120" height="120"></canvas><div class="no">02</div></div>
-          <b>Название трека</b><i>автор</i>
+          <b>Рок звезда должна умереть</b><i>Lida</i>
           <div class="foil"></div>
         </div>
         <div class="track">
           <div class="cov"><canvas id="t3" width="120" height="120"></canvas><div class="no">03</div></div>
-          <b>Название трека</b><i>автор</i>
+          <b>Пистолет</b><i>ПЛМ</i>
           <div class="foil"></div>
         </div>
       </div>
@@ -326,39 +322,39 @@
 
   <div class="vhead">
     <h2>Видео</h2>
-    <div class="vnote">последние шесть<small>канал M_0_O_n · подтягивается само</small></div>
+    <div class="vnote">последние видео</div></div>
   </div>
 
   <div class="vgrid">
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v1" width="384" height="216"></canvas><span class="dur">14:02</span><div class="foil"></div></div>
-      <h3>Поднял сервер ТОМ с нуля — полная экскурсия</h3>
-      <div class="vmeta"><span>3 недели назад</span><b>142K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=iXiOvUcmyuk">
+      <div class="shot"><canvas id="v1" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>Machine Startup | mod VFXWeaver showcase</h3>
+      <div class="vmeta"><span>2 месяца назад</span></div>
     </a>
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v2" width="384" height="216"></canvas><span class="dur">08:41</span><div class="foil"></div></div>
-      <h3>Мой пиксель-арт: от скетча на бумаге до обложки</h3>
-      <div class="vmeta"><span>месяц назад</span><b>98K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=YxrAz_jDg-o">
+      <div class="shot"><canvas id="v2" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>Мяукаю разными голосами на протяжении 4 минут 12 секунд</h3>
+      <div class="vmeta"><span>5 месяцев назад</span></div>
     </a>
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v3" width="384" height="216"></canvas><span class="dur">21:18</span><div class="foil"></div></div>
-      <h3>Как я анимирую трейлеры внутри Minecraft</h3>
-      <div class="vmeta"><span>месяц назад</span><b>210K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=BeIPPA7L8Vo">
+      <div class="shot"><canvas id="v3" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>В погоне за славой</h3>
+      <div class="vmeta"><span>7 месяцев назад</span></div>
     </a>
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v4" width="384" height="216"></canvas><span class="dur">11:37</span><div class="foil"></div></div>
-      <h3>Десять обложек за один вечер — челлендж</h3>
-      <div class="vmeta"><span>2 месяца назад</span><b>76K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=PyI2Q5AMkfw">
+      <div class="shot"><canvas id="v4" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>Mslan - скрытый гость острова Эпштейна? | КУБЕКЕ интервью</h3>
+      <div class="vmeta"><span>8 месяцев назад</span></div>
     </a>
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><span class="dur">17:55</span><div class="foil"></div></div>
-      <h3>Айдентика сервера за сутки: бриф, эскизы, финал</h3>
-      <div class="vmeta"><span>3 месяца назад</span><b>54K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=ZpK1r0yEEA4">
+      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>Ураа, ствол!</h3>
+      <div class="vmeta"><span>10 месяцев назад</span></div>
     </a>
-    <a class="vcard" href="#">
-      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><span class="dur">26:30</span><div class="foil"></div></div>
-      <h3>Разбираю старые работы — что бы я сделал иначе</h3>
-      <div class="vmeta"><span>4 месяца назад</span><b>61K</b></div>
+    <a class="vcard" href="https://www.youtube.com/watch?v=XxTPc5zvvro">
+      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>2D-аниматор vs ИИ — может ли нейросеть заменить человека?</h3>
+      <div class="vmeta"><span>11 месяцев назад</span></div>
     </a>
   </div>
 </section>
@@ -366,11 +362,10 @@
 <footer class="foot">
   <div class="grain"></div>
   <div class="fh">написать мне</div>
-  <a class="mail" href="mailto:hi@artition.ru">hi@<em>artition</em>.ru</a>
+  <a class="mail" href="https://t.me/ArtitionStar?direct">написать мне</a>
   <div class="fl">
-    <a href="#">telegram</a><a href="#">youtube</a><a href="#">discord</a><a href="#">vk</a>
+    <a href="https://t.me/ArtitionStar">telegram</a><a href="https://www.youtube.com/@artition1">youtube</a><a href="https://www.tiktok.com/@artition">tiktok</a>
   </div>
-  <div class="print"><span>© 2026 Artition</span><span>сделано руками, без шаблонов</span></div>
 </footer>
 
 <script>
@@ -587,7 +582,7 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
 (async()=>{
   await document.fonts.ready;
   const NS='http://www.w3.org/2000/svg';
-  const TAG='дизайн, монтаж, миры';
+  const TAG='дизайн, арты, видео';
   const tg=document.getElementById('tagLetters');
   const mg=document.getElementById('maskLetters');
   const cx=document.createElement('canvas').getContext('2d');
@@ -892,24 +887,48 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
   const stopsB=[[0,[12,8,24]],[1,[236,231,218]]];
   const stopsC=[[0,[10,6,20]],[.55,[70,32,150]],[1,[255,140,60]]];
   const specs=[
-    ['v1',stopsA,(u,v)=>Math.min(1,Math.max(0,.98-.98*Math.hypot(u-.42,v-.48)))],
-    ['v2',stopsB,(u,v)=>Math.min(1,Math.max(0,.72-.55*Math.abs(v-.5)+.22*Math.sin(u*17)))],
-    ['v3',stopsC,(u,v)=>Math.min(1,Math.max(0,.15+.85*(u*.62+v*.38)))],
-    ['v4',stopsA,(u,v)=>Math.min(1,Math.max(0,.55+.55*Math.sin(Math.hypot(u-.5,v-.5)*23-.8)))],
-    ['v5',stopsC,(u,v)=>Math.min(1,Math.max(0,.9-.9*Math.abs(v-.42)*1.9+.18*Math.sin(u*9+1)))],
-    ['v6',stopsA,(u,v)=>Math.min(1,Math.max(0,.92-.92*Math.hypot(u-.62,v-.58)*1.35))]
+    ['v1','iXiOvUcmyuk',stopsA,(u,v)=>Math.min(1,Math.max(0,.98-.98*Math.hypot(u-.42,v-.48)))],
+    ['v2','YxrAz_jDg-o',stopsB,(u,v)=>Math.min(1,Math.max(0,.72-.55*Math.abs(v-.5)+.22*Math.sin(u*17)))],
+    ['v3','BeIPPA7L8Vo',stopsC,(u,v)=>Math.min(1,Math.max(0,.15+.85*(u*.62+v*.38)))],
+    ['v4','PyI2Q5AMkfw',stopsA,(u,v)=>Math.min(1,Math.max(0,.55+.55*Math.sin(Math.hypot(u-.5,v-.5)*23-.8)))],
+    ['v5','ZpK1r0yEEA4',stopsC,(u,v)=>Math.min(1,Math.max(0,.9-.9*Math.abs(v-.42)*1.9+.18*Math.sin(u*9+1)))],
+    ['v6','XxTPc5zvvro',stopsA,(u,v)=>Math.min(1,Math.max(0,.92-.92*Math.hypot(u-.62,v-.58)*1.35))]
   ];
-  specs.forEach(([id,stops,field])=>{
+  const thumbCache={};
+  function ditherPhoto(cvs,img,stops){
+    const W=cvs.width,H=cvs.height,ctx=cvs.getContext('2d');
+    const iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height, tr=16/9, ir=iw/ih;
+    let sw,sh,sx,sy;
+    if(ir>tr){ sh=ih; sw=ih*tr; sx=(iw-sw)/2; sy=0; } else { sw=iw; sh=iw/tr; sx=0; sy=(ih-sh)/2; }
+    ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
+    const px=ctx.getImageData(0,0,W,H), d=px.data, out=ctx.createImageData(W,H), o=out.data;
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+      const i=(y*W+x)*4;
+      let v=(0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2])/255;
+      v=Math.min(1,Math.max(0,(v-0.5)*1.35+0.5));
+      const th=(B4[((y/3)|0)%4][((x/3)|0)%4]+0.5)/16;
+      v=Math.round(Math.min(1,Math.max(0,v+(th-0.5)/3))*2)/2;
+      const c=ramp(v,stops);
+      o[i]=c[0];o[i+1]=c[1];o[i+2]=c[2];o[i+3]=255;
+    }
+    ctx.putImageData(out,0,0);
+  }
+  function drawVideo(id,vid,stops,field){
     const c=document.getElementById(id);
-    if(c){ sizeCanvas(c,16/9); ditherCanvas(c,{cell:3,levels:3,stops,field}); }
-  });
+    if(!c) return;
+    c.setAttribute('aria-hidden','true');
+    sizeCanvas(c,16/9);
+    if(thumbCache[vid]){ ditherPhoto(c,thumbCache[vid],stops); return; }
+    const img=new Image();
+    img.onload=()=>{ thumbCache[vid]=img; const cc=document.getElementById(id); if(cc){ sizeCanvas(cc,16/9); ditherPhoto(cc,img,stops); } };
+    img.onerror=()=>{ const cc=document.getElementById(id); if(cc) ditherCanvas(cc,{cell:3,levels:3,stops,field}); };
+    img.src='assets/thumbs/'+vid+'.jpg';
+  }
+  specs.forEach(([id,vid,stops,field])=>drawVideo(id,vid,stops,field));
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
-    let rs=false;
-    specs.forEach(([id])=>{ const c=document.getElementById(id); if(!c) return;
+    specs.forEach(([id,vid,stops,field])=>{ const c=document.getElementById(id); if(!c) return;
       const w=Math.max(12,Math.round(c.clientWidth/3)), h=Math.max(12,Math.round(w/(16/9)));
-      if(c.width!==w||c.height!==h){ c.width=w; c.height=h; rs=true; } });
-    if(rs) specs.forEach(([id,stops,field])=>{ const c=document.getElementById(id);
-      if(c) ditherCanvas(c,{cell:3,levels:3,stops,field}); });
+      if(c.width!==w||c.height!==h) drawVideo(id,vid,stops,field); });
   });
 })();
 
