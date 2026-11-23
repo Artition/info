@@ -642,8 +642,8 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{
       const W=R.offsetWidth||720,H=R.offsetHeight||1000,step=9,amp=13,pts=[];
       for(let y=0;y<=H;y+=step){ const t=y/step+ns; const n=vn(t)*.65+vn(t*3.7+9)*.35; pts.push([y,n*amp]); }
       const bot=[];
-      for(let x=0;x<=W;x+=step){ const t2=x/step; const n2=vn(t2+61)*.65+vn(t2*3.1+17)*.35; bot.push(`${(x-n2*amp).toFixed(1)}px ${H}px`); }
-      R.style.clipPath=`polygon(${[...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),...bot,`${W}px 0`].join(',')})`;
+      for(let x=step;x<W;x+=step){ const t2=x/step; const n2=vn(t2+61)*.65+vn(t2*3.1+17)*.35; bot.push(`${(x-n2*amp).toFixed(1)}px ${H}px`); }
+      R.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${x.toFixed(1)}px ${y}px`),...bot,`${W}px ${H}px`,`${W}px 0`].join(',')})`;
       L.style.clipPath=`polygon(${['0 0',...pts.map(([y,x])=>`${(W+x).toFixed(1)}px ${y}px`),'0 100%'].join(',')})`;
       const B=document.querySelector('.burn');
       if(B){
