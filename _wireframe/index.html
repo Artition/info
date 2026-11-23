@@ -798,143 +798,71 @@ balatro(document.getElementById('bg2'));
 
 document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.soc')) e.preventDefault(); },true);
 
-/* ── перетаскивание: превью видео, соцсети, треки, логотип ── */
+/* ── перетаскивание с настоящей физикой: карты, иконки, треки, логотип ── */
 (function(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const targets=[...document.querySelectorAll('.soc,.track,.mark img,.mark svg')];
-  for(const el of targets){
+
+  function bind(el,o){
+    o=o||{};
+    const spin=o.spin??0.45, lift=o.lift??1.05, tiltK=o.tilt??0, escape=!!o.escape;
     el.draggable=false;
-    el.style.touchAction='none';
-    el.style.userSelect='none';
+    el.style.touchAction='pan-y';
     el.addEventListener('dragstart',e=>e.preventDefault());
-
-    let st=null, timer=0;
-    const pos={x:0,y:0,vx:0,vy:0}, tgt={x:0,y:0};
-
-    function paint(){
-      /* наклон и растяжение — от СКОРОСТИ, а не от расстояния */
-      const sp=Math.hypot(pos.vx,pos.vy);
-      const rot=Math.max(-7,Math.min(7,pos.vx*0.22));
-      const sx=1+Math.min(.16,sp*0.0022);
-      const sy=1-Math.min(.10,sp*0.0013);
-      el.style.translate=pos.x.toFixed(1)+'px '+pos.y.toFixed(1)+'px';
-      el.style.rotate=rot.toFixed(2)+'deg';
-      el.style.scale=sx.toFixed(3)+' '+sy.toFixed(3);
-    }
-    function tick(){
-      /* инерция: позиция догоняет курсор, скорость плавно гаснет */
-      pos.x += (tgt.x-pos.x)*0.30;
-      pos.y += (tgt.y-pos.y)*0.30;
-      pos.vx *= 0.82; pos.vy *= 0.82;
-      paint();
-      if(!st && Math.hypot(pos.vx,pos.vy)<0.02 && Math.abs(pos.x)<0.05 && Math.abs(pos.y)<0.05){
-        el.style.translate=''; el.style.rotate=''; el.style.scale='';
-        clearInterval(timer); timer=0;
-      }
-    }
-    function run(){ if(!timer) timer=setInterval(tick,16); }
-
-    el.addEventListener('pointerdown',e=>{
-      if(e.button!==0) return;
-      st={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false};
-      el.__drag=st;
-      if(el.__return){ el.__return.cancel(); el.__return=null; }
-      const cs=getComputedStyle(el);
-      pos.x=parseFloat(el.style.translate?.split(' ')[0])||0;
-      pos.y=parseFloat(el.style.translate?.split(' ')[1])||0;
-      pos.vx=0; pos.vy=0;
-      tgt.x=pos.x; tgt.y=pos.y;
-      el.setPointerCapture(e.pointerId);
-    });
-    el.addEventListener('pointermove',e=>{
-      if(!st||e.pointerId!==st.id) return;
-      const dx=e.clientX-st.x, dy=e.clientY-st.y;
-      if(!st.moved&&Math.hypot(dx,dy)>5){ st.moved=true; el.style.cursor='grabbing'; }
-      if(!st.moved) return;
-      /* скорость — разница между прошлой и новой целью */
-      pos.vx += (dx-tgt.x)*0.55;
-      pos.vy += (dy-tgt.y)*0.55;
-      tgt.x=dx; tgt.y=dy;
-      run();
-    });
-    const end=()=>{
-      if(!st) return;
-      const moved=st.moved;
-      st=null; el.__drag=null;
-      el.style.cursor='';
-      if(!moved){ tgt.x=0; tgt.y=0; run(); return; }
-      el.__clickBlock=true;
-      /* оттянули и отпустили: возврат с перелётом (back-out) */
-      const fromX=pos.x, fromY=pos.y;
-      const sp=Math.hypot(pos.vx,pos.vy);
-      const fromRot=Math.max(-7,Math.min(7,pos.vx*0.22));
-      const a=el.animate([
-        {translate:fromX.toFixed(1)+'px '+fromY.toFixed(1)+'px',rotate:fromRot.toFixed(2)+'deg',
-         scale:(1+Math.min(.16,sp*0.0022)).toFixed(3)+' '+(1-Math.min(.10,sp*0.0013)).toFixed(3)},
-        {translate:'0px 0px',rotate:'0deg',scale:'1 1'}
-      ],{duration:680,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'none'});
-      el.__return=a;
-      clearInterval(timer); timer=0;
-      tgt.x=pos.x; tgt.y=pos.y;
-      a.onfinish=()=>{ el.style.translate=''; el.style.rotate=''; el.style.scale=''; el.__return=null; };
-    };
-    el.addEventListener('pointerup',end);
-    el.addEventListener('pointercancel',end);
-    el.addEventListener('click',e=>{
-      if(el.__clickBlock){ el.__clickBlock=false; e.preventDefault(); e.stopPropagation(); }
-    },true);
-  }
-})();
-</script>
-
-<script>
-/* ── карточки видео: физика как у карт в Балатро ── */
-(function(){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  for(const el of document.querySelectorAll('.vcard')){
-    el.draggable=false;
-    const sec=el.closest('.paperSec')||el.parentElement;
-    let st=null, timer=0, t0=0;
+    const sec=escape?el.closest('.paperSec'):null;
+    let st=null, timer=0, lastT=0;
     const s={x:0,y:0,vx:0,vy:0,rot:0,vrot:0,tx:0,ty:0};
 
     function paint(){
       el.style.translate=s.x.toFixed(1)+'px '+s.y.toFixed(1)+'px';
       el.style.rotate=s.rot.toFixed(2)+'deg';
-      el.style.setProperty('--rx',s.tx.toFixed(2)+'deg');
-      el.style.setProperty('--ry',s.ty.toFixed(2)+'deg');
+      if(tiltK){
+        el.style.setProperty('--rx',Math.max(-22,Math.min(22,s.tx)).toFixed(2)+'deg');
+        el.style.setProperty('--ry',Math.max(-22,Math.min(22,s.ty)).toFixed(2)+'deg');
+      }
     }
     function stop(){
       el.style.translate=''; el.style.rotate=''; el.style.scale='';
-      el.style.setProperty('--rx','0deg'); el.style.setProperty('--ry','0deg');
+      if(tiltK){ el.style.setProperty('--rx','0deg'); el.style.setProperty('--ry','0deg'); }
       el.style.zIndex='';
-      if(sec.__ovf) { sec.style.overflow=''; sec.__ovf=false; }
-      clearInterval(timer); timer=0; t0=0;
+      if(sec&&sec.__ovf){ sec.style.overflow=''; sec.__ovf=false; }
+      clearInterval(timer); timer=0; lastT=0;
     }
     function tick(){
       if(st) return;
-      /* пружина: доворот с проскальзыванием, позиция и наклон тянутся к нулю */
-      s.vrot*=0.90; s.rot+=s.vrot; s.rot+=-s.rot*0.06;
-      s.vx*=0.86; s.vy*=0.86;
-      s.x+=s.vx-s.x*0.14; s.y+=s.vy-s.y*0.14;
-      s.tx+=-s.tx*0.15; s.ty+=-s.ty*0.15;
+      const now=performance.now();
+      const dt=Math.min(3,Math.max(.4,(now-(lastT||now))/16.67)); lastT=now;
+      /* угловая инерция: докручивается и тормозит трением */
+      s.rot+=s.vrot*dt;
+      s.vrot*=Math.pow(0.94,dt);
+      /* когда докрут почти кончился — пружина ведёт карту в исходный угол */
+      if(Math.abs(s.vrot)<2) s.vrot+=-s.rot*0.05*dt;
+      s.x+=s.vx*dt; s.y+=s.vy*dt;
+      s.vx*=Math.pow(0.86,dt); s.vy*=Math.pow(0.86,dt);
+      s.x+=-s.x*0.15*dt; s.y+=-s.y*0.15*dt;
+      s.tx+=-s.tx*0.15*dt; s.ty+=-s.ty*0.15*dt;
       paint();
-      if(!t0) t0=performance.now();
-      const done = Math.abs(s.rot)<0.25 && Math.abs(s.vrot)<0.08
-        && Math.abs(s.x)<0.8 && Math.abs(s.y)<0.8
-        && Math.abs(s.tx)<0.2 && Math.abs(s.ty)<0.2;
-      if(done || performance.now()-t0>2600) stop();
+      /* докрут не должен длиться вечно: через 2.2 с мягко доводим в покой */
+      if(s.rel&&now-s.rel>2200){ finalize(); return; }
+      if(Math.abs(s.rot)<0.25&&Math.abs(s.vrot)<0.3&&Math.abs(s.x)<0.8&&Math.abs(s.y)<0.8
+        &&Math.abs(s.tx)<0.2&&Math.abs(s.ty)<0.2) stop();
     }
-    function run(){ if(!timer){ t0=0; timer=setInterval(tick,16); } }
+    function finalize(){
+      clearInterval(timer); timer=0;
+      const from={translate:s.x.toFixed(1)+'px '+s.y.toFixed(1)+'px',rotate:s.rot.toFixed(2)+'deg'};
+      if(tiltK){ from.rotateX=s.tx.toFixed(2)+'deg'; from.rotateY=s.ty.toFixed(2)+'deg'; }
+      const anim=el.animate([from,{translate:'0px 0px',rotate:'0deg'}],
+        {duration:560,easing:'cubic-bezier(.34,1.56,.64,1)'});
+      anim.onfinish=()=>{ stop(); };
+    }
+    function run(){ if(!timer){ lastT=0; s.rel=0; timer=setInterval(tick,16); } }
 
     el.addEventListener('pointerdown',e=>{
       if(e.button!==0||e.pointerType==='touch') return;
-      st={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
-      el.__drag=st; el.__phys=true;
+      st={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,vx:0,vy:0};
+      el.__drag=st;
       el.style.zIndex='40';
-      el.style.scale='1.05 1.05';
-      /* карта должна выезжать за границы секции, а не обрезаться */
-      if(getComputedStyle(sec).overflow!=='visible'){ sec.style.overflow='visible'; sec.__ovf=true; }
-      s.vrot=0; s.vx=0; s.vy=0;
+      el.style.scale=lift+' '+lift;
+      if(sec&&getComputedStyle(sec).overflow!=='visible'){ sec.style.overflow='visible'; sec.__ovf=true; }
       el.setPointerCapture(e.pointerId);
       paint();
     });
@@ -944,24 +872,23 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
       if(!st.moved&&Math.hypot(dx,dy)>4){ st.moved=true; el.style.cursor='grabbing'; }
       if(!st.moved) return;
       st.x=e.clientX; st.y=e.clientY;
-      /* карта идёт точно за рукой, без привязи */
       s.x+=dx; s.y+=dy;
-      /* горизонтальное движение проворачивает карту — можно накрутить хоть три оборота */
-      s.rot+=dx*0.35;
-      s.vrot=dx*0.5;
+      /* докрут от движения руки: круговой жест накручивает обороты без предела */
+      s.rot+=dx*spin;
+      /* мгновенная угловая скорость — её карта и уносит с собой на отпускании */
+      s.vrot=dx*spin*0.85+(s.vrot||0)*0.15;
       s.vx=dx*0.9; s.vy=dy*0.9;
-      /* наклон — от смещения относительно центра, как настоящая карта в руке */
-      s.ty=Math.max(-22,Math.min(22,s.x*0.10));
-      s.tx=Math.max(-22,Math.min(22,-s.y*0.10));
+      s.ty=s.x*tiltK; s.tx=-s.y*tiltK;
       paint();
     });
     const end=()=>{
       if(!st) return;
       const moved=st.moved;
-      st=null; el.__drag=null; el.__phys=false;
+      st=null; el.__drag=null;
       el.style.cursor='';
       if(moved) el.__clickBlock=true;
       run();
+      s.rel=performance.now();
     };
     el.addEventListener('pointerup',end);
     el.addEventListener('pointercancel',end);
@@ -969,6 +896,11 @@ document.addEventListener('dragstart',e=>{ if(e.target.closest('.vcard,.track,.s
       if(el.__clickBlock){ el.__clickBlock=false; e.preventDefault(); e.stopPropagation(); }
     },true);
   }
+
+  /* карты видео: тянутся, крутятся, выезжают за границы секции */
+  document.querySelectorAll('.vcard').forEach(el=>bind(el,{spin:0.42,lift:1.05,tilt:0.10,escape:true}));
+  /* всё остальное: соцсети, треки, логотип */
+  document.querySelectorAll('.soc,.track,.mark img,.mark svg').forEach(el=>bind(el,{spin:0.55,lift:1.06}));
 })();
 </script>
 
