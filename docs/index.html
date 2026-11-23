@@ -49,8 +49,8 @@
   .plate{position:relative;display:block;overflow:visible;width:100%;max-width:520px;height:auto}
   .plate .nm text{font-family:"UnboundedX",sans-serif;font-weight:900;font-size:138px;letter-spacing:-4.8px;fill:var(--ink)}
 
-  #flame{position:absolute;left:-300px;top:-10px;width:480px;height:960px;image-rendering:pixelated;z-index:1;
-    transform:rotate(-3deg) scaleX(-1)}
+  #flame{position:absolute;left:24px;top:58%;width:auto;height:80%;aspect-ratio:1/2;image-rendering:pixelated;z-index:1;
+    transform:translateY(-50%) rotate(-3deg) scaleX(-1)}
 
   /* ── куб: чёрно-белый дизер ── */
   .cubeWrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1200px;height:1200px;z-index:1;pointer-events:none}
@@ -153,7 +153,6 @@
   @keyframes ember{to{filter:brightness(.82)}}
   @media (prefers-reduced-motion:reduce){.burn{animation:none}}
   .foot>*{position:relative}
-  .foot .fh{grid-column:1;font-family:"Chaos16",monospace;font-size:21px;color:rgba(239,233,220,.78)}
   .mail{grid-column:1;display:inline-block;margin:13px 0 0;font-family:"UnboundedX",sans-serif;font-weight:900;font-size:clamp(40px,7vw,89px);
     letter-spacing:-.035em;color:#EFE9DC;text-decoration:none;transition:color .2s}
   .mail em{font-style:normal;color:var(--orange)}
@@ -182,7 +181,7 @@
     .mark{gap:9px}
     .mark .wm{font-size:10px}
     .plate{width:100%;height:auto}
-    #flame{left:-140px;top:auto;bottom:0;width:320px;height:640px}
+    #flame{left:16px;top:16px;bottom:16px;height:auto;transform:rotate(-3deg) scaleX(-1)}
     .cubeWrap{display:none}
     .soc-bar{gap:7px;margin-top:16px}
     .soc{width:30px;height:30px}
@@ -347,15 +346,15 @@
       <h3>Mslan - скрытый гость острова Эпштейна? | КУБЕКЕ интервью</h3>
       <div class="vmeta"><span>8 месяцев назад</span></div>
     </a>
-    <a class="vcard" href="https://www.youtube.com/watch?v=XxTPc5zvvro">
-      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><div class="foil"></div></div>
-      <h3>2D-аниматор vs ИИ — может ли нейросеть заменить человека?</h3>
-      <div class="vmeta"><span>11 месяцев назад</span></div>
-    </a>
     <a class="vcard" href="https://www.youtube.com/watch?v=R3AXUGGvKXA">
-      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><div class="foil"></div></div>
+      <div class="shot"><canvas id="v5" width="384" height="216"></canvas><div class="foil"></div></div>
       <h3>Lida - Рок звезда должна умереть | Клип</h3>
       <div class="vmeta"><span>1 год назад</span></div>
+    </a>
+    <a class="vcard" href="https://www.youtube.com/watch?v=XxTPc5zvvro">
+      <div class="shot"><canvas id="v6" width="384" height="216"></canvas><div class="foil"></div></div>
+      <h3>2D-аниматор vs ИИ — может ли нейросеть заменить человека?</h3>
+      <div class="vmeta"><span>11 месяцев назад</span></div>
     </a>
   </div>
   <!-- VIDEOS:END -->
@@ -363,7 +362,6 @@
 
 <footer class="foot">
   <div class="grain"></div>
-  <div class="fh">написать мне</div>
   <a class="mail" href="https://t.me/ArtitionStar?direct">написать мне</a>
   <div class="fl">
     <a href="https://t.me/ArtitionStar">telegram</a><a href="https://www.youtube.com/@artition1">youtube</a><a href="https://www.tiktok.com/@artition">tiktok</a>
