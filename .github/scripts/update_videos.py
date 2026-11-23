@@ -110,8 +110,9 @@ def main():
                 req, timeout=30).read().decode("utf-8")
             for item in re.findall(
                     r'"id"\s*:\s*"([^"]+)"(.*?)"duration"\s*:\s*"([^"]+)"',
-                    data):
+                    data, flags=re.S):
                 api_cache[item[0]] = iso_seconds(item[2])
+            print(f"api: parsed {len(api_cache)} durations")
         except Exception as e:
             print(f"api error: {e}")
     for vid, title, pub in entries:
