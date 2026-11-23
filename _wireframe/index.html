@@ -1103,7 +1103,7 @@ balatro(document.getElementById('bg2'));
       const cs=getComputedStyle(el), fs=parseFloat(cs.fontSize);
       const lh=parseFloat(cs.lineHeight)||fs*1.4;
       g.font=cs.fontStyle+' '+cs.fontWeight+' '+fs+'px '+cs.fontFamily;
-      g.lineWidth=Math.max(4,fs*(el.classList.contains('lead')?0.30:0.18));
+      g.lineWidth=Math.max(6,fs*0.42);
       let txt=(el.textContent||'').trim().replace(/\s+/g,' ');
       if(cs.textTransform==='uppercase') txt=txt.toUpperCase();
       const words=txt.split(' '), lines=[]; let line='';
