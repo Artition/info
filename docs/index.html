@@ -442,30 +442,55 @@ for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
   soft[y*FW+x]*=ex*ey;
 }
 let fseed=1;
+/* маска выреза: подзаголовок с обводкой, отрисованный в координатах страницы */
+function tagCutMask(){
+  const plate=document.querySelector('.plate');
+  const ts=[...document.querySelectorAll('#tagLetters text')];
+  if(!plate||!ts.length) return null;
+  const pw=plate.getBoundingClientRect().width; if(!pw) return null;
+  const scale=pw/520, fs=44*scale, sw=20*scale;
+  const items=[];
+  for(const t of ts){
+    const ch=t.textContent, r=t.getBoundingClientRect();
+    if(!ch.trim()||(!r.width&&!r.height)) continue;
+    items.push({ch,r});
+  }
+  if(!items.length) return null;
+  const x0=Math.min(...items.map(i=>i.r.left))-sw, y0=Math.min(...items.map(i=>i.r.top))-sw;
+  const x1=Math.max(...items.map(i=>i.r.right))+sw, y1=Math.max(...items.map(i=>i.r.bottom))+sw;
+  const w=Math.ceil(x1-x0), h=Math.ceil(y1-y0);
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const g=c.getContext('2d');
+  g.font=`${fs}px Chaos16`; g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle='#000'; g.strokeStyle='#000'; g.lineWidth=sw; g.lineJoin='round';
+  for(const {ch,r} of items){
+    const xm=r.left+r.width/2-x0, ym=r.top+r.height/2-y0;
+    g.strokeText(ch,xm,ym); g.fillText(ch,xm,ym);
+  }
+  return {a:g.getImageData(0,0,w,h).data,w,h,x0,y0};
+}
 function drawFlame(){
   const ctx=fc.getContext('2d'), img=new ImageData(FW,FH), d=img.data;
-  /* дырка в пламени по форме подзаголовка с обводкой (та же ширина 20, что в маске cutTag) */
-  const fr=fc.getBoundingClientRect(), holes=[];
-  if(fr.width>0){
-    const plate=document.querySelector('.plate');
-    const pad=plate?20*plate.getBoundingClientRect().width/520:24;
-    const ts=document.querySelectorAll('#tagLetters text');
-    for(const t of ts){
-      const r=t.getBoundingClientRect();
-      if(r.width===0&&r.height===0) continue;
-      const ax=(1-(r.right+pad-fr.left)/fr.width)*FW, bx=(1-(r.left-pad-fr.left)/fr.width)*FW;
-      const ay=(r.top-pad-fr.top)/fr.height*FH, by=(r.bottom+pad-fr.top)/fr.height*FH;
-      holes.push([Math.min(ax,bx),Math.min(ay,by),Math.max(ax,bx),Math.max(ay,by)]);
-    }
+  /* вырез в пламени по контуру букв подзаголовка (с обводкой, как в маске cutTag) */
+  const fr=fc.getBoundingClientRect(), cut=fr.width?tagCutMask():null;
+  let cx0=fr.left+fr.width/2, cy0=fr.top+fr.height/2, mx=null, ew=fc.offsetWidth, eh=fc.offsetHeight;
+  if(cut){
+    const tf=getComputedStyle(fc).transform;
+    mx=tf&&tf!=='none'?new DOMMatrix(tf):null;
+    cx0=fr.left+fr.width/2; cy0=fr.top+fr.height/2;
   }
   const PIX=2; /* размер пикселя дизера */
   for(let y=0;y<FH;y++)for(let x=0;x<FW;x++){
     const px=(x/PIX)|0, py=(y/PIX)|0;
-    const i=y*FW+x, cx=x+0.5, cy=y+0.5;
-    let cut=false;
-    for(let k=0;k<holes.length;k++){ const h=holes[k];
-      if(cx>=h[0]&&cx<=h[2]&&cy>=h[1]&&cy<=h[3]){ cut=true; break; } }
-    if(cut){ d[i*4+3]=0; continue; }
+    const i=y*FW+x;
+    if(cut){
+      /* буфер → локальные координаты элемента → страница (с зеркалом и поворотом) */
+      const u=(x+0.5)/FW*ew-ew/2, v=(y+0.5)/FH*eh-eh/2;
+      let pxx=cx0+u, pyy=cy0+v;
+      if(mx){ pxx=cx0+mx.a*u+mx.c*v; pyy=cy0+mx.b*u+mx.d*v; }
+      const mxx=Math.floor(pxx-cut.x0), myy=Math.floor(pyy-cut.y0);
+      if(mxx>=0&&myy>=0&&mxx<cut.w&&myy<cut.h&&cut.a[(myy*cut.w+mxx)*4+3]>127){ d[i*4+3]=0; continue; }
+    }
     const n=fbm(px*0.09,py*0.09,fseed);
     const er=Math.max(0,(28-x)/28);
     const thr=0.30+(n-0.5)*0.62+er*(0.10+0.22*fbm(px*0.23+7.3,py*0.23+3.1,fseed));
@@ -741,8 +766,8 @@ balatro(document.getElementById('bg2'));
   setInterval(()=>{
     if(document.hidden) return;
     for(const el of els){
-      el.style.translate=`${((Math.random()-.5)*6).toFixed(1)}px ${((Math.random()-.5)*6).toFixed(1)}px`;
-      el.style.rotate=`${((Math.random()-.5)*3).toFixed(2)}deg`;
+      el.style.translate=`${((Math.random()-.5)*2.4).toFixed(1)}px ${((Math.random()-.5)*2.4).toFixed(1)}px`;
+      el.style.rotate=`${((Math.random()-.5)*1.2).toFixed(2)}deg`;
     }
   },1000);
 })();
