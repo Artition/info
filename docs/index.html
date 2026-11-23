@@ -38,8 +38,6 @@
   .paperPanel{position:absolute;left:0;top:0;width:calc(50% + 24px);height:100%;overflow:hidden;z-index:0}
   .paperPanel .paperbg{position:absolute;inset:0;background-image:url("assets/paper.png");
     background-size:135% 135%;background-position:center;opacity:.22;mix-blend-mode:multiply}
-  .paperPanel .halftone{position:absolute;inset:0;opacity:.2;
-    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
   .bgPanel{position:absolute;left:50%;top:0;width:50%;height:100%;background:var(--night);overflow:hidden;z-index:0}
   .bgPanel #bg{position:absolute;inset:0;width:100%;height:100%}
   .bgPanel .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,2,15,.3) 0%,rgba(5,2,15,.64) 55%,rgba(5,2,15,.9) 100%)}
@@ -127,8 +125,6 @@
   /* ── секция «видео» на бумаге ── */
   .paperSec{position:relative;padding:89px 60px 109px;background:var(--paper);overflow:hidden;z-index:1}
   .paperSec>.tex{position:absolute;inset:0;background-image:url("assets/paper.png");background-size:cover;background-position:center;opacity:.22;mix-blend-mode:multiply;pointer-events:none}
-  .paperSec>.dots{position:absolute;inset:0;opacity:.16;pointer-events:none;
-    background-image:radial-gradient(circle at center, rgba(23,18,16,.55) 1px, transparent 1.1px);background-size:6px 6px}
   .paperSec>*{position:relative}
   .vhead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:55px}
   .vhead h2{font-family:"UnboundedX";font-weight:900;font-size:89px;line-height:.9;letter-spacing:-.035em;text-transform:uppercase}
@@ -288,7 +284,7 @@
 
 <div class="screen">
   <div class="paperPanel">
-    <div class="paperbg"></div><div class="halftone"></div>
+    <div class="paperbg"></div>
     <canvas id="flame" width="160" height="320" aria-hidden="true"></canvas>
   </div>
 
@@ -366,7 +362,7 @@
 </div>
 
 <section class="paperSec vsec">
-  <div class="tex"></div><div class="dots"></div>
+  <div class="tex"></div>
 
   <div class="vhead">
     <h2>Видео</h2>
