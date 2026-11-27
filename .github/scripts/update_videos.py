@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Fetch latest YouTube videos and rewrite the videos block in docs/index.html.
+"""Fetch latest YouTube videos and rewrite the videos block.
 
-Reads the channel RSS feed, takes the 6 newest videos, downloads their
-thumbnails into docs/assets/thumbs/, and replaces everything between
-<!-- VIDEOS:START --> and <!-- VIDEOS:END --> with fresh cards.
+Reads the channel RSS feed, takes the 6 newest long videos, downloads their
+thumbnails and replaces everything between <!-- VIDEOS:START --> and
+<!-- VIDEOS:END --> with fresh cards — in BOTH docs/index.html (published)
+and _wireframe/index.html (working copy), so the next local copy can't
+undo the refresh.
+
+Card markup matches the hand-made one: 640x360 canvas, data-fit on every
+card after the first, duration badge, and view count instead of a date
+(date is only a fallback when the views service is unreachable).
+
 Run daily via .github/workflows/videos.yml; safe to run manually.
 """
 import datetime
@@ -22,8 +29,10 @@ COUNT = 6
 API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../.github/scripts
 ROOT = os.path.dirname(os.path.dirname(HERE))       # repo root (.../.github -> ...)
-PAGE = os.path.join(ROOT, "docs", "index.html")
-THUMBS = os.path.join(ROOT, "docs", "assets", "thumbs")
+PAGES = [os.path.join(ROOT, "docs", "index.html"),
+         os.path.join(ROOT, "_wireframe", "index.html")]
+THUMB_DIRS = [os.path.join(ROOT, "docs", "assets", "thumbs"),
+              os.path.join(ROOT, "_wireframe", "assets", "thumbs")]
 RSS = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
 UA = {"User-Agent": "Mozilla/5.0 (artition-site videos updater)"}
 
@@ -54,6 +63,22 @@ def rel_date(pub, today):
         return f"{months} {plural(months, ['месяц', 'месяца', 'месяцев'])} назад"
     y = round(months / 12)
     return f"{y} {plural(y, ['год', 'года', 'лет'])} назад"
+
+
+def _dec(x):
+    """63.7 -> '63,7'; 1.0 -> '1'."""
+    return f"{x:.1f}".replace(".", ",").rstrip("0").rstrip(",")
+
+
+def fmt_views(n):
+    """1474 -> '1,5 тыс. просмотров', 63712 -> '63,7 тыс. просмотров'."""
+    if n is None:
+        return None
+    if n >= 1_000_000:
+        return f"{_dec(n / 1_000_000)} млн просмотров"
+    if n >= 1000:
+        return f"{_dec(n / 1000)} тыс. просмотров"
+    return f"{n} {plural(n, ['просмотр', 'просмотра', 'просмотров'])}"
 
 
 def iso_seconds(s):
@@ -91,6 +116,37 @@ def fetch_seconds(vid):
         except Exception:
             continue
     return None
+
+
+def fetch_views(vid):
+    """View count via returnyoutubedislikeapi, or None."""
+    try:
+        req = urllib.request.Request(
+            f"https://returnyoutubedislikeapi.com/votes?videoId={vid}",
+            headers=UA)
+        data = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
+        m = re.search(r'"viewCount"\s*:\s*(\d+)', data)
+        return int(m.group(1)) if m else None
+    except Exception:
+        return None
+
+
+def fetch_thumb(vid, dest):
+    """Download the sharpest available thumbnail for a video."""
+    for name in ("maxresdefault", "sddefault", "hqdefault"):
+        try:
+            req = urllib.request.Request(
+                f"https://i.ytimg.com/vi/{vid}/{name}.jpg", headers=UA)
+            with urllib.request.urlopen(req, timeout=30) as r:
+                body = r.read()
+            if len(body) > 4000:          # 120x90 placeholder is ~1-2 KB
+                with open(dest, "wb") as f:
+                    f.write(body)
+                return True
+        except Exception:
+            continue
+    print(f"{vid}: thumbnail download failed")
+    return False
 
 
 def main():
@@ -138,46 +194,53 @@ def main():
         raise SystemExit(f"only {len(videos)} long videos in feed, aborting")
 
     today = datetime.date.today()
-    os.makedirs(THUMBS, exist_ok=True)
+    for d in THUMB_DIRS:
+        os.makedirs(d, exist_ok=True)
     for vid, _, _, _ in videos:
-        dest = os.path.join(THUMBS, f"{vid}.jpg")
-        if not os.path.exists(dest):
-            req = urllib.request.Request(
-                f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg", headers=UA)
-            with urllib.request.urlopen(req, timeout=30) as r, \
-                    open(dest, "wb") as f:
-                f.write(r.read())
+        for d in THUMB_DIRS:
+            dest = os.path.join(d, f"{vid}.jpg")
+            if not os.path.exists(dest):
+                fetch_thumb(vid, dest)
     # prune thumbs of videos that fell out of the list
     keep = {f"{vid}.jpg" for vid, _, _, _ in videos}
-    for name in os.listdir(THUMBS):
-        if name.endswith(".jpg") and name not in keep:
-            os.remove(os.path.join(THUMBS, name))
+    for d in THUMB_DIRS:
+        for name in os.listdir(d):
+            if name.endswith(".jpg") and name not in keep:
+                os.remove(os.path.join(d, name))
 
     cards = []
     for i, (vid, title, pub, secs) in enumerate(videos, 1):
+        views = fmt_views(fetch_views(vid))
+        meta = views or rel_date(pub, today)
+        print(f"{vid}: {meta}")
+        fit = ' data-fit="1"' if i > 1 else ""
         cards.append(
             f'    <a class="vcard" href="https://www.youtube.com/watch?v={vid}">\n'
-            f'      <div class="shot"><canvas id="v{i}" width="384" height="216">'
+            f'      <div class="shot"><canvas id="v{i}"{fit} width="640" height="360">'
             f"</canvas><div class=\"foil\"></div>"
             f"<span class=\"vdur\">{fmt_dur(secs)}</span></div>\n"
             f"      <h3>{html.escape(title, quote=False)}</h3>\n"
-            f'      <div class="vmeta"><span>{rel_date(pub, today)}</span></div>\n'
+            f'      <div class="vmeta"><span>{meta}</span></div>\n'
             f"    </a>"
         )
     block = ("  <!-- VIDEOS:START -->\n  <div class=\"vgrid\">\n"
              + "\n".join(cards)
              + "\n  </div>\n  <!-- VIDEOS:END -->")
 
-    with open(PAGE, encoding="utf-8") as f:
-        page = f.read()
-    new_page, n = re.subn(
-        r"  <!-- VIDEOS:START -->.*?  <!-- VIDEOS:END -->",
-        lambda _: block, page, count=1, flags=re.S)
-    if n != 1:
-        raise SystemExit("videos markers not found in docs/index.html")
-    if new_page != page:
-        with open(PAGE, "w", encoding="utf-8", newline="") as f:
-            f.write(new_page)
+    changed = False
+    for path in PAGES:
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        new_page, n = re.subn(
+            r"  <!-- VIDEOS:START -->.*?  <!-- VIDEOS:END -->",
+            lambda _: block, page, count=1, flags=re.S)
+        if n != 1:
+            raise SystemExit(f"videos markers not found in {path}")
+        if new_page != page:
+            with open(path, "w", encoding="utf-8", newline="") as f:
+                f.write(new_page)
+            changed = True
+    if changed:
         print(f"updated: {[v[0] for v in videos]}")
     else:
         print("no changes")
